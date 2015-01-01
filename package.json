@@ -1,0 +1,38 @@
+{
+  "name": "tcpie",
+  "version": "0.1.0",
+  "description": "'ping'-like utility to repeatedly test a remote TCP port for connectivity",
+  "author": "silverwind <silv3rwind@gmail.com> (https://github.com/silverwind)",
+  "license": "BSD-2-clause",
+  "bugs": {
+    "url": "https://github.com/silverwind/tcpie/issues"
+  },
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/silverwind/tcpie"
+  },
+  "homepage": "https://github.com/silverwind/tcpie",
+  "keywords": [
+    "tcp",
+    "port",
+    "ping",
+    "test",
+    "connect",
+    "connection"
+  ],
+  "bin": {
+    "tcpie": "cli.js"
+  },
+  "dependencies": {
+    "chalk": "^0.5.1",
+    "commander": "^2.6.0",
+    "defaults": "^1.0.0"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-bump": "0.0.16",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-shell": "^1.1.1"
+  }
+}
