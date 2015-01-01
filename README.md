@@ -8,8 +8,6 @@ $ [sudo] npm install -g tcpie
 ###Example
 ```
 $ tcpie -c 5 google.com
-```
-```
 TCPIE google.com (188.21.9.20) port 80
 connected to google.com:80 seq=1 time=30.3
 connected to google.com:80 seq=2 time=30.5
@@ -46,27 +44,24 @@ pie.on("end", function(stats) {
     // -> { sent: 10, success: 10, failed: 0 }
 });
 
-pie.start();
+pie.start(); // Starts connecting
 ```
-### tcpie(host, port, opts)
+### tcpie(host, port, options)
 *Creates a new connector.*
 - `host`: *string* the destination hostname or IP address.
 - `port`: *number* the destination port.
 - `opts`: *object* options for count, interval and timeout.
-
-### tcpie.start()
-*Starts connecting.*
-
-### `options` Object
-- `count`   : *number* the number of connection attempts in milliseconds.
-- `interval`: *number* the interval between connection attempts in milliseconds.
-- `timeout` : *number* the connection timeout in milliseconds.
 
 ### Events
 - `error`   : Arguments: `seq`, `stats`, `err`. Emmited when an connection error happens.
 - `connect` : Arguments: `seq`, `stats`, `ttl`. Emmited when an connection attempt succeeds.
 - `timeout` : Arguments: `seq`, `stats`. Emmited when an connection attempt runs into the timeout.
 - `end`     : Arguments: `stats`. Emmitted when all attempts (defined by `count`) are finished.
+
+### `options` Object
+- `count`   : *number* the number of connection attempts in milliseconds.
+- `interval`: *number* the interval between connection attempts in milliseconds.
+- `timeout` : *number* the connection timeout in milliseconds.
 
 ### `stats` Object
 - `sent`    : *number* total number of attempts made.
