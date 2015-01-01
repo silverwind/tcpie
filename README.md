@@ -27,10 +27,10 @@ tcpie [options] host [port]
 ```
     -h, --help          output usage information
     -V, --version       output the version number
-    -c, --count <n>     Number of connects (default: Infinte)
-    -i, --interval <n>  Wait n seconds between connects (default: 1)
-    -t, --timeout <n>   Connection timeout in seconds (default: 3)
-    -f, --flood         Flood Mode, Connect as fast as possible
+    -c, --count <n>     number of connects (default: Infinte)
+    -i, --interval <n>  wait n seconds between connects (default: 1)
+    -t, --timeout <n>   connection timeout in seconds (default: 3)
+    -f, --flood         flood mode, connect as fast as possible
 ```
 
 ##Module API

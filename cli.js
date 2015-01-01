@@ -11,12 +11,12 @@ var cmd    = require("commander"),
 cmd
     .version(pkg.version)
     .usage("[options] host [port]")
-    .option("-c, --count <n>", "Number of connects (default: Infinte)", parseInt)
-    .option("-i, --interval <n>", "Wait n seconds between connects (default: 1)", parseFloat)
-    .option("-t, --timeout <n>", "Connection timeout in seconds (default: 3)", parseInt)
-    .option("-f, --flood", "Flood Mode, Connect as fast as possible")
+    .option("-c, --count <n>", "number of connects (default: Infinte)", parseInt)
+    .option("-i, --interval <n>", "wait n seconds between connects (default: 1)", parseFloat)
+    .option("-t, --timeout <n>", "connection timeout in seconds (default: 3)", parseInt)
+    .option("-f, --flood", "flood mode, connect as fast as possible")
     .on("--help", function() {
-        writeLine("  Note: Port defaults to 80");
+        writeLine("  Note: port defaults to 80");
         writeLine();
         writeLine("  Examples:");
         writeLine();
