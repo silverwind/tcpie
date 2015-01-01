@@ -34,6 +34,10 @@ tcpie [options] host [port]
 ```
 
 ##Module API
+##Installation
+```
+$ npm install --save tcpie
+```
 ###Example
 ```js
 var tcpie = require("tcpie"),
@@ -44,10 +48,9 @@ pie.on("end", function(stats) {
     // -> { sent: 10, success: 10, failed: 0 }
 });
 
-pie.start(); // Starts connecting
+pie.start(); // Starts the connection attempt(s)
 ```
-### tcpie(host, port, options)
-*Creates a new connector.*
+### tcpie(host, [port], [options])
 - `host`: *string* the destination hostname or IP address.
 - `port`: *number* the destination port.
 - `opts`: *object* options for count, interval and timeout.

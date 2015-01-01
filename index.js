@@ -5,23 +5,24 @@ var tcpie, host, port, opts,
     events   = require("events"),
     defaults = require("defaults"),
     emitter  = new events.EventEmitter(),
-    stats    = {
+    stats = {
         sent   : 0,
         success: 0,
         failed : 0
-    };
-
-tcpie = function tcpie (h, p, o) {
-    if (typeof h !== "string" || typeof p !== "number")
-        throw new Error("host and port are required");
-
-    host = h;
-    port = p;
-    opts = defaults(o, {
+    },
+    def = {
         interval: 1000,
         timeout : 3000,
         count   : Infinity
-    });
+    };
+
+tcpie = function tcpie (h, p, o) {
+    if (typeof h !== "string")
+        throw new Error("host is required");
+
+    host = h;
+    port = typeof p === "number" ? p : 80;
+    opts = defaults(typeof o === "object" ? o : p, def);
 
     emitter.start = function start() {
         connect();
