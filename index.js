@@ -57,7 +57,7 @@ Tcpie.prototype.start = function start() {
         checkEnd(instance);
     });
 
-    instance.stats.sent++;
+    stats.sent++;
 
     socket.connect(instance.port, instance.host, function () {
         instance.emit("connect", seq, stats, details(socket), ms(now() - startTime));
