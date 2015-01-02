@@ -1,70 +1,80 @@
 "use strict";
 
-var tcpie, host, port, opts,
-    net      = require("net"),
+var defaults = require("defaults"),
     events   = require("events"),
-    defaults = require("defaults"),
-    emitter  = new events.EventEmitter(),
-    stats = {
-        sent   : 0,
-        success: 0,
-        failed : 0
-    },
-    def = {
+    net      = require("net"),
+    util     = require("util");
+
+var Tcpie = function (host, port, opts) {
+    if (typeof host !== "string")
+        throw new Error("host is required");
+
+    if (typeof port === "undefined")
+        port = 80;
+
+    this.host = host;
+    this.port = port;
+    this.opts = defaults(opts, {
         interval: 1000,
         timeout : 3000,
         count   : Infinity
+    });
+    this.stats = {
+        sent   : 0,
+        success: 0,
+        failed : 0
     };
-
-tcpie = function tcpie (h, p, o) {
-    if (typeof h !== "string")
-        throw new Error("host is required");
-
-    host = h;
-    port = typeof p === "number" ? p : 80;
-    opts = defaults(typeof o === "object" ? o : p, def);
-
-    emitter.start = function start() {
-        connect();
-    };
-
-    return emitter;
 };
 
-module.exports = exports = tcpie;
+util.inherits(Tcpie, events.EventEmitter);
 
-function connect() {
-    if (stats.sent >= opts.count) return;
+Tcpie.prototype.start = function start() {
+    var instance  = this,
+        stats     = this.stats,
+        opts      = this.opts;
 
-    setTimeout(connect, opts.interval);
+    if (stats.sent >= stats.count) return;
 
-    var socket = new net.Socket(),
-        start  = now(),
-        seq    = stats.sent + 1;
+    setTimeout(start.bind(this), opts.interval);
+
+    var socket    = new net.Socket(),
+        startTime = now(),
+        seq       = stats.sent + 1;
 
     socket.setTimeout(opts.timeout);
 
     socket.on("timeout", function () {
         socket.destroy();
         stats.failed++;
-        emitter.emit("timeout", seq, stats);
-        if ((stats.failed + stats.success) >= opts.count) emitter.emit("end", stats);
+        instance.emit("timeout", seq, stats);
+        checkEnd(instance);
     });
 
     socket.on("error", function(err) {
         socket.destroy();
         stats.failed++;
-        emitter.emit("error", seq, stats, err);
-        if ((stats.failed + stats.success) >= opts.count) emitter.emit("end", stats);
+        instance.emit("error", seq, stats, err);
+        checkEnd(instance);
     });
 
-    stats.sent++;
-    socket.connect(port, host, function () {
+    instance.stats.sent++;
+
+    socket.connect(instance.port, instance.host, function () {
         socket.end();
         stats.success++;
-        emitter.emit("connect", seq, stats, ms(now() - start));
-        if ((stats.failed + stats.success) >= opts.count) emitter.emit("end", stats);
+        instance.emit("connect", seq, stats, ms(now() - startTime));
+        checkEnd(instance);
     });
+};
+
+module.exports = function(host, port, opts) {
+    return new Tcpie(host, port, opts);
+};
+
+// check end condition
+function checkEnd(instance) {
+    if ((instance.stats.failed + instance.stats.success) >= instance.opts.count)
+        instance.emit("end", instance.stats);
 }
 
 // get current timestamp in nanoseconds
@@ -75,5 +85,5 @@ function now() {
 
 // convert nanoseconds to milliseconds
 function ms(ns) {
-    return (ns / 1000000);
+    return (ns / 1e6);
 }

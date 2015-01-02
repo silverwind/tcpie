@@ -42,52 +42,12 @@ if (cmd.interval) opts.interval = secondsToMs(cmd.interval);
 if (cmd.timeout) opts.count = secondsToMs(cmd.timeout);
 if (cmd.flood) opts.interval = 0;
 
-function printStart(dstString, port) {
-    writeLine(pkg.name.toUpperCase(), dstString, "port", String(port));
-}
-
-function printEnd() {
-    var sum = 0, min = Infinity, max = 0, avg;
-
-    if (rtts.length) {
-        rtts.forEach(function(rtt) {
-            if (rtt <= min) min = rtt.toFixed(3);
-            if (rtt >= max) max = rtt.toFixed(3);
-            sum += rtt;
-        });
-
-        avg = (sum / rtts.length).toFixed(3);
-        if (isNaN(avg)) avg = 0;
-
-        writeLine("");
-        writeLine("---", host, pkg.name + " statistics", "---");
-        writeLine(stats.sent, "handshakes attempted,", stats.success, "succeeded,",
-                  (stats.failed / stats.sent).toFixed(0) * 100 + "% failed");
-        writeLine("rtt min/avg/max =", min + "/" + avg + "/" + max, "ms");
-    }
-    process.exit(0);
-}
-
-process.on("SIGINT", printEnd);
-process.on("SIGQUIT", printEnd);
-process.on("SIGTERM", printEnd);
-
-// try a dns lookup and start the connects
-var dstString;
-if (net.isIP(host)) {
-    dns.reverse(host, function (err, domains) {
-        if (!err) {
-            dstString = host + " (" + domains[0] + ")";
-        } else {
-            dstString = host + " (" + host + ")";
-        }
-        printStart(dstString, port);
-        run(host, port, opts, domains ? domains[0] : undefined);
-    });
-} else {
+// Do a DNS lookup and start the connects
+if (!net.isIP(host)) {
     dns.lookup(host, function (err, address) {
         if (!err) {
-            dstString = host + " (" + address + ")";
+            printStart(host, address, port);
+            run(host, port, opts, host);
         } else {
             if (err.code === "ENOTFOUND")
                 writeLine(chalk.red("ERROR:"), "Domain", host, "not found.");
@@ -95,8 +55,6 @@ if (net.isIP(host)) {
                 writeLine(chalk.red("ERROR:"), err.code, err.syscall || "");
             process.exit(1);
         }
-        printStart(dstString, port);
-        run(host, port, opts, host);
     });
 }
 
@@ -124,7 +82,36 @@ function run(host, port, opts, hostname) {
         printEnd();
     });
 
+    process.on("SIGINT", printEnd);
+    process.on("SIGQUIT", printEnd);
+    process.on("SIGTERM", printEnd);
+
     pie.start();
+}
+
+function printStart(host, address, port) {
+    writeLine(pkg.name.toUpperCase(), host , "(" + address + ")", "port", String(port));
+}
+
+function printEnd() {
+    var sum = 0, min = Infinity, max = 0, avg;
+
+    if (rtts.length) {
+        rtts.forEach(function(rtt) {
+            if (rtt <= min) min = rtt.toFixed(3);
+            if (rtt >= max) max = rtt.toFixed(3);
+            sum += rtt;
+        });
+
+        avg = (sum / rtts.length).toFixed(3);
+        if (isNaN(avg)) avg = 0;
+
+        writeLine("\n---", host, pkg.name + " statistics", "---");
+        writeLine(stats.sent, "handshakes attempted,", stats.success, "succeeded,",
+                  (stats.failed / stats.sent).toFixed(0) * 100 + "% failed");
+        writeLine("rtt min/avg/max =", min + "/" + avg + "/" + max, "ms");
+    }
+    process.exit(0);
 }
 
 function writeLine() {
@@ -135,5 +122,5 @@ function writeLine() {
 
 // convert seconds to milliseconds
 function secondsToMs(s) {
-    return (parseFloat(s) * 1000).toFixed(0);
+    return (parseFloat(s) * 1000);
 }
