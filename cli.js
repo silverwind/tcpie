@@ -6,6 +6,7 @@ var cmd    = require("commander"),
     net    = require("net"),
     dns    = require("dns"),
     pkg    = require("./package.json"),
+    stdev  = require("compute-stdev"),
     tcpie  = require("./");
 
 cmd
@@ -81,7 +82,7 @@ function run(host, port, opts, hostname) {
             chalk.green((hostname || host) + ":" + port),
             chalk.yellow("seq=") + chalk.green(seq),
             chalk.yellow("srcport=") + chalk.green(details.localPort),
-            chalk.yellow("time=") + colorRTT(rtt.toFixed(1) + " ms");
+            chalk.yellow("time=") + colorRTT(rtt.toFixed(1) + " ms"));
     });
 
     pie.on("timeout", function(seq, st, details) {
@@ -110,7 +111,7 @@ function printStart(host, address, port) {
 }
 
 function printEnd() {
-    var sum = 0, min = Infinity, max = 0, avg;
+    var sum = 0, min = Infinity, max = 0, avg, sd;
 
     if (rtts.length) {
         rtts.forEach(function(rtt) {
@@ -122,10 +123,13 @@ function printEnd() {
         avg = (sum / rtts.length).toFixed(3);
         if (isNaN(avg)) avg = 0;
 
+        sd = stdev(rtts).toFixed(3);
+        if (isNaN(sd)) sd = 0;
+
         writeLine("\n---", host, pkg.name + " statistics", "---");
         writeLine(stats.sent, "handshakes attempted,", stats.success, "succeeded,",
             ((stats.failed / stats.sent) * 100).toFixed(0) + "% failed");
-        writeLine("rtt min/avg/max =", min + "/" + avg + "/" + max, "ms");
+        writeLine("rtt min/avg/max/stdev =", min + "/" + avg + "/" + max + "/" + sd, "ms");
     }
     process.exit(0);
 }

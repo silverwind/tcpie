@@ -27,6 +27,7 @@
   "dependencies": {
     "chalk": "^0.5.1",
     "commander": "^2.6.0",
+    "compute-stdev": "^1.0.0",
     "defaults": "^1.0.0"
   },
   "devDependencies": {
