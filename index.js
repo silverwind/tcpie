@@ -50,7 +50,7 @@ Tcpie.prototype.start = function start() {
         checkEnd(instance);
     });
 
-    socket.on("error", function(err) {
+    socket.on("error", function (err) {
         instance.emit("error", seq, stats, details(socket), err);
         socket.destroy();
         stats.failed++;
@@ -69,7 +69,7 @@ Tcpie.prototype.start = function start() {
     return instance;
 };
 
-module.exports = function(host, port, opts) {
+module.exports = function (host, port, opts) {
     return new Tcpie(host, port, opts);
 };
 

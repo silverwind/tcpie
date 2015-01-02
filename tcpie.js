@@ -17,7 +17,7 @@ cmd
     .option("-t, --timeout <n>", "connection timeout in seconds (default: 3)", parseInt)
     .option("-f, --flood", "flood mode, connect as fast as possible")
     .option("--color", "enable color output")
-    .on("--help", function() {
+    .on("--help", function () {
         writeLine("  Note: port defaults to 80");
         writeLine();
         writeLine("  Examples:");
@@ -39,7 +39,7 @@ var opts   = {},
     rtts   = [],
     stats;
 
-if (cmd.count) opts.count = parseInt(cmd.count);
+if (cmd.count) opts.count = parseInt(cmd.count, 10);
 if (cmd.interval) opts.interval = secondsToMs(cmd.interval);
 if (cmd.timeout) opts.count = secondsToMs(cmd.timeout);
 if (cmd.flood) opts.interval = 0;
@@ -59,12 +59,15 @@ if (!net.isIP(host)) {
             process.exit(1);
         }
     });
+} else {
+    printStart(host, host, port);
+    run(host, port, opts, host);
 }
 
 function run(host, port, opts, hostname) {
     var pie = tcpie(host, port, opts);
 
-    pie.on("error", function(seq, st, details, err) {
+    pie.on("error", function (seq, st, details, err) {
         stats = st;
         writeLine(
             chalk.red("error connecting to"),
@@ -74,7 +77,7 @@ function run(host, port, opts, hostname) {
             chalk.red(err.code) || "");
     });
 
-    pie.on("connect", function(seq, st, details, rtt) {
+    pie.on("connect", function (seq, st, details, rtt) {
         stats = st;
         rtts.push(rtt);
         writeLine(
@@ -85,7 +88,7 @@ function run(host, port, opts, hostname) {
             chalk.yellow("time=") + colorRTT(rtt.toFixed(1) + " ms"));
     });
 
-    pie.on("timeout", function(seq, st, details) {
+    pie.on("timeout", function (seq, st, details) {
         stats = st;
         writeLine(
                   chalk.red("timeout connecting to"),
@@ -94,7 +97,7 @@ function run(host, port, opts, hostname) {
                   chalk.yellow("srcport=") + chalk.green(details.localPort));
     });
 
-    pie.on("end", function(st) {
+    pie.on("end", function (st) {
         stats = st;
         printEnd();
     });
@@ -107,14 +110,14 @@ function run(host, port, opts, hostname) {
 }
 
 function printStart(host, address, port) {
-    writeLine(pkg.name.toUpperCase(), host , "(" + address + ")", "port", String(port));
+    writeLine(pkg.name.toUpperCase(), host, "(" + address + ")", "port", String(port));
 }
 
 function printEnd() {
     var sum = 0, min = Infinity, max = 0, avg, sd;
 
     if (rtts.length) {
-        rtts.forEach(function(rtt) {
+        rtts.forEach(function (rtt) {
             if (rtt <= min) min = rtt.toFixed(3);
             if (rtt >= max) max = rtt.toFixed(3);
             sum += rtt;
