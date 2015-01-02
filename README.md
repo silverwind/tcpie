@@ -31,7 +31,7 @@ Options:
   -i, --interval <n>  wait n seconds between connects (default: 1)
   -t, --timeout <n>   connection timeout in seconds (default: 3)
   -f, --flood         flood mode, connect as fast as possible
-
+  --color             enable color output
 ```
 
 ##Module API

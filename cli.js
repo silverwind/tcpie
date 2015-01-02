@@ -15,6 +15,7 @@ cmd
     .option("-i, --interval <n>", "wait n seconds between connects (default: 1)", parseFloat)
     .option("-t, --timeout <n>", "connection timeout in seconds (default: 3)", parseInt)
     .option("-f, --flood", "flood mode, connect as fast as possible")
+    .option("--color", "enable color output")
     .on("--help", function() {
         writeLine("  Note: port defaults to 80");
         writeLine();
@@ -41,6 +42,7 @@ if (cmd.count) opts.count = parseInt(cmd.count);
 if (cmd.interval) opts.interval = secondsToMs(cmd.interval);
 if (cmd.timeout) opts.count = secondsToMs(cmd.timeout);
 if (cmd.flood) opts.interval = 0;
+if (!cmd.color) chalk.enabled = false;
 
 // Do a DNS lookup and start the connects
 if (!net.isIP(host)) {
@@ -63,21 +65,32 @@ function run(host, port, opts, hostname) {
 
     pie.on("error", function(seq, st, details, err) {
         stats = st;
-        writeLine("error connecting to", (hostname || host) + ":" + port, "seq=" + seq,
-            "srcport=" + details.localPort, err.code || "");
+        writeLine(
+            chalk.red("error connecting to"),
+            chalk.red(hostname || host) + ":" + port,
+            chalk.yellow("seq=") + chalk.green(seq),
+            chalk.yellow("srcport=") + chalk.green(details.localPort),
+            chalk.red(err.code) || "");
     });
 
     pie.on("connect", function(seq, st, details, rtt) {
         stats = st;
         rtts.push(rtt);
-        writeLine("connected to", (hostname || host) + ":" + port, "seq=" + seq,
-            "srcport=" + details.localPort, "time=" + rtt.toFixed(1));
+        writeLine(
+            chalk.green("connected to"),
+            chalk.green((hostname || host) + ":" + port),
+            chalk.yellow("seq=") + chalk.green(seq),
+            chalk.yellow("srcport=") + chalk.green(details.localPort),
+            chalk.yellow("time=") + colorRTT(rtt.toFixed(1)));
     });
 
     pie.on("timeout", function(seq, st, details) {
         stats = st;
-        writeLine("timeout connecting to", (hostname || host) + ":" + port, "seq=" + seq,
-                  "srcport=" + details.localPort);
+        writeLine(
+                  chalk.red("timeout connecting to"),
+                  chalk.red((hostname || host) + ":" + port),
+                  chalk.yellow("seq=") + chalk.green(seq),
+                  chalk.yellow("srcport=") + chalk.green(details.localPort));
     });
 
     pie.on("end", function(st) {
@@ -111,10 +124,19 @@ function printEnd() {
 
         writeLine("\n---", host, pkg.name + " statistics", "---");
         writeLine(stats.sent, "handshakes attempted,", stats.success, "succeeded,",
-                  (stats.failed / stats.sent).toFixed(0) * 100 + "% failed");
+            ((stats.failed / stats.sent) * 100).toFixed(0) + "% failed");
         writeLine("rtt min/avg/max =", min + "/" + avg + "/" + max, "ms");
     }
     process.exit(0);
+}
+
+function colorRTT(rtt) {
+    if (rtt >= 150)
+        return chalk.red(rtt);
+    else if (rtt >= 75)
+        return chalk.yellow(rtt);
+    else
+        return chalk.green(rtt);
 }
 
 function writeLine() {
