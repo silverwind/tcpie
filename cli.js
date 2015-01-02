@@ -81,7 +81,7 @@ function run(host, port, opts, hostname) {
             chalk.green((hostname || host) + ":" + port),
             chalk.yellow("seq=") + chalk.green(seq),
             chalk.yellow("srcport=") + chalk.green(details.localPort),
-            chalk.yellow("time=") + colorRTT(rtt.toFixed(1)));
+            chalk.yellow("time=") + colorRTT(rtt.toFixed(1) + " ms");
     });
 
     pie.on("timeout", function(seq, st, details) {
