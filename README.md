@@ -40,15 +40,15 @@ $ npm install --save tcpie
 ```
 ###Example
 ```js
-var tcpie = require("tcpie"),
-    pie   = tcpie("google.com", 80, {count: 10, interval: 500, timeout: 2000});
+var tcpie = require("tcpie");
+var pie = tcpie("google.com", 80, {count: 10, interval: 500, timeout: 2000});
 
-pie.on("end", function(stats) {
+pie.on("connect", function(seq) {
+    console.log("connect", seq);
+}).on("end", function(stats) {
     console.log(stats);
     // -> { sent: 10, success: 10, failed: 0 }
-});
-
-pie.start(); // Starts the connection attempt(s)
+}).start();
 ```
 ### tcpie(host, [port], [options])
 - `host`: *string* the destination hostname or IP address.

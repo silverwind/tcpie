@@ -33,7 +33,7 @@ Tcpie.prototype.start = function start() {
         stats     = this.stats,
         opts      = this.opts;
 
-    if (stats.sent >= stats.count) return;
+    if (stats.sent >= opts.count) return;
 
     setTimeout(start.bind(this), opts.interval);
 
@@ -65,6 +65,8 @@ Tcpie.prototype.start = function start() {
         instance.emit("connect", seq, stats, ms(now() - startTime));
         checkEnd(instance);
     });
+
+    return instance;
 };
 
 module.exports = function(host, port, opts) {
