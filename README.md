@@ -21,20 +21,21 @@ rtt min/avg/max = 29.691/30.105/30.452 ms
 ```
 ##Usage
 ```
-tcpie [options] host [port]
-```
-##Options
-```
-    -h, --help          output usage information
-    -V, --version       output the version number
-    -c, --count <n>     number of connects (default: Infinte)
-    -i, --interval <n>  wait n seconds between connects (default: 1)
-    -t, --timeout <n>   connection timeout in seconds (default: 3)
-    -f, --flood         flood mode, connect as fast as possible
+Usage: cli [options] host [port]
+
+Options:
+
+  -h, --help          output usage information
+  -V, --version       output the version number
+  -c, --count <n>     number of connects (default: Infinte)
+  -i, --interval <n>  wait n seconds between connects (default: 1)
+  -t, --timeout <n>   connection timeout in seconds (default: 3)
+  -f, --flood         flood mode, connect as fast as possible
+
 ```
 
 ##Module API
-##Installation
+###Installation
 ```
 $ npm install --save tcpie
 ```
