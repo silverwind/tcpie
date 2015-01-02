@@ -57,16 +57,16 @@ pie.on("connect", function(seq) {
 - `opts` *object* : options for count, interval and timeout.
 
 #### Events
-- `error`   : Arguments: `seq`, `stats`, `details`, `err`. Emmited when an connection error happens.
-- `connect` : Arguments: `seq`, `stats`, `details`, `rtt`. Emmited when an connection attempt succeeds.
-- `timeout` : Arguments: `seq`, `stats`, `details`, . Emmited when an connection attempt runs into the timeout.
+- `error`   : Arguments: `seq`, `stats`, `details`, `err`. Connection error happens.
+- `connect` : Arguments: `seq`, `stats`, `details`, `rtt`. Connection attempt succeeded.
+- `timeout` : Arguments: `seq`, `stats`, `details`, . Connection attempt ran into the timeout.
 - `end`     : Arguments: `stats`. Emmitted when all attempts (defined by `count`) are finished.
 
 #### Event arguments
 - `seq`     *number* : current sequence number. Starting at 1.
 - `stats`   *object* : stats object descibed below.
 - `details` *object* : socket details, `localAddress`, `localPort`, `remoteAddress`, `remotePort`.
-- `rtt`     *number* : total time to establish handshake in milliseconds, with decimal precision up to nanoseconds.
+- `rtt`     *number* : total time to establish handshake in milliseconds (not rounded).
 - `err`     *error*  : connection error on the `error` event.
 
 #### *options* object
