@@ -35,7 +35,7 @@ Tcpie.prototype.start = function start() {
 
     if (stats.sent >= opts.count) return;
 
-    setTimeout(start.bind(this), opts.interval);
+    instance.next = setTimeout(start.bind(this), opts.interval);
 
     var socket    = new net.Socket(),
         startTime = now(),
@@ -85,8 +85,10 @@ function details(socket) {
 
 // check end condition
 function checkEnd(instance) {
-    if ((instance.stats.failed + instance.stats.success) >= instance.opts.count)
+    if ((instance.stats.failed + instance.stats.success) >= instance.opts.count) {
+        if (instance.next) clearTimeout(instance.next);
         instance.emit("end", instance.stats);
+    }
 }
 
 // get current timestamp in nanoseconds
