@@ -22,7 +22,7 @@
     "connection"
   ],
   "bin": {
-    "tcpie": "cli.js"
+    "tcpie": "tcpie.js"
   },
   "dependencies": {
     "chalk": "^0.5.1",

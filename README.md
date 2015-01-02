@@ -21,7 +21,7 @@ rtt min/avg/max/stdev = 25.757/28.835/31.908/2.184 ms
 ```
 ##Usage
 ```
-Usage: cli [options] host [port]
+Usage: tcpie [options] host [port]
 
 Options:
 
