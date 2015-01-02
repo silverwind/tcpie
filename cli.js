@@ -61,20 +61,23 @@ if (!net.isIP(host)) {
 function run(host, port, opts, hostname) {
     var pie = tcpie(host, port, opts);
 
-    pie.on("error", function(seq, st, err) {
+    pie.on("error", function(seq, st, details, err) {
         stats = st;
-        writeLine("error connecting to", (hostname || host) + ":" + port, "seq=" + seq, err.code || "");
+        writeLine("error connecting to", (hostname || host) + ":" + port, "seq=" + seq,
+            "srcport=" + details.localPort, err.code || "");
     });
 
-    pie.on("connect", function(seq, st, rtt) {
+    pie.on("connect", function(seq, st, details, rtt) {
         stats = st;
         rtts.push(rtt);
-        writeLine("connected to", (hostname || host) + ":" + port, "seq=" + seq, "time=" + rtt.toFixed(1));
+        writeLine("connected to", (hostname || host) + ":" + port, "seq=" + seq,
+            "srcport=" + details.localPort, "time=" + rtt.toFixed(1));
     });
 
-    pie.on("timeout", function(seq, st) {
+    pie.on("timeout", function(seq, st, details) {
         stats = st;
-        writeLine("timeout connecting to", (hostname || host) + ":" + port, "seq=" + seq);
+        writeLine("timeout connecting to", (hostname || host) + ":" + port, "seq=" + seq,
+                  "srcport=" + details.localPort);
     });
 
     pie.on("end", function(st) {

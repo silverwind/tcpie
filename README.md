@@ -57,10 +57,17 @@ pie.on("connect", function(seq) {
 - `opts`: *object* options for count, interval and timeout.
 
 ### Events
-- `error`   : Arguments: `seq`, `stats`, `err`. Emmited when an connection error happens.
-- `connect` : Arguments: `seq`, `stats`, `rtt`. Emmited when an connection attempt succeeds.
-- `timeout` : Arguments: `seq`, `stats`. Emmited when an connection attempt runs into the timeout.
+- `error`   : Arguments: `seq`, `stats`, `details`, `err`. Emmited when an connection error happens.
+- `connect` : Arguments: `seq`, `stats`, `details`, `rtt`. Emmited when an connection attempt succeeds.
+- `timeout` : Arguments: `seq`, `stats`, `details`, . Emmited when an connection attempt runs into the timeout.
 - `end`     : Arguments: `stats`. Emmitted when all attempts (defined by `count`) are finished.
+
+### Event arguments
+- `seq`     : *number* current sequence number. Starting at 1.
+- `stats`   : *object* stats object descibed below.
+- `details` : *object* socket connection details, containing `localAddress`, `localPort`, `remoteAddress`, `remotePort`.
+- `rtt`     : *number* total time to establish handshake in milliseconds, with decimal precision up to nanoseconds.
+- `err`     : *error* connection error on the `error` event.
 
 ### `options` Object
 - `count`   : *number* the number of connection attempts in milliseconds (default: Infinity).
@@ -71,9 +78,5 @@ pie.on("connect", function(seq) {
 - `sent`    : *number* total number of attempts made.
 - `success` : *number* number of successfull attempts.
 - `failed`  : *number* number of failed attempts.
-
-### Event arguments
-- `seq`     : *number* current sequence number. Starting at 1.
-- `rtt`     : *number* total time to establish handshake in milliseconds, with decimal precision up to nanoseconds.
 
 © 2015 [silverwind](https://github.com/silverwind), distributed under BSD licence

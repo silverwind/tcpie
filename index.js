@@ -44,25 +44,25 @@ Tcpie.prototype.start = function start() {
     socket.setTimeout(opts.timeout);
 
     socket.on("timeout", function () {
+        instance.emit("timeout", seq, stats, details(socket));
         socket.destroy();
         stats.failed++;
-        instance.emit("timeout", seq, stats);
         checkEnd(instance);
     });
 
     socket.on("error", function(err) {
+        instance.emit("error", seq, stats, details(socket), err);
         socket.destroy();
         stats.failed++;
-        instance.emit("error", seq, stats, err);
         checkEnd(instance);
     });
 
     instance.stats.sent++;
 
     socket.connect(instance.port, instance.host, function () {
+        instance.emit("connect", seq, stats, details(socket), ms(now() - startTime));
         socket.end();
         stats.success++;
-        instance.emit("connect", seq, stats, ms(now() - startTime));
         checkEnd(instance);
     });
 
@@ -72,6 +72,16 @@ Tcpie.prototype.start = function start() {
 module.exports = function(host, port, opts) {
     return new Tcpie(host, port, opts);
 };
+
+// construct details object
+function details(socket) {
+    return {
+        localAddress  : socket.localAddress,
+        localPort     : socket.localPort,
+        remoteAddress : socket.remoteAddress,
+        remotePort    : socket.remotePort
+    };
+}
 
 // check end condition
 function checkEnd(instance) {
