@@ -57,18 +57,22 @@ pie.start(); // Starts the connection attempt(s)
 
 ### Events
 - `error`   : Arguments: `seq`, `stats`, `err`. Emmited when an connection error happens.
-- `connect` : Arguments: `seq`, `stats`, `ttl`. Emmited when an connection attempt succeeds.
+- `connect` : Arguments: `seq`, `stats`, `rtt`. Emmited when an connection attempt succeeds.
 - `timeout` : Arguments: `seq`, `stats`. Emmited when an connection attempt runs into the timeout.
 - `end`     : Arguments: `stats`. Emmitted when all attempts (defined by `count`) are finished.
 
 ### `options` Object
-- `count`   : *number* the number of connection attempts in milliseconds.
-- `interval`: *number* the interval between connection attempts in milliseconds.
-- `timeout` : *number* the connection timeout in milliseconds.
+- `count`   : *number* the number of connection attempts in milliseconds (default: Infinity).
+- `interval`: *number* the interval between connection attempts in milliseconds (default: 1000).
+- `timeout` : *number* the connection timeout in milliseconds (default: 3000).
 
 ### `stats` Object
 - `sent`    : *number* total number of attempts made.
 - `success` : *number* number of successfull attempts.
 - `failed`  : *number* number of failed attempts.
+
+### Event arguments
+- `seq`     : *number* current sequence number. Starting at 1.
+- `rtt`     : *number* total time to establish handshake in milliseconds, with decimal precision up to nanoseconds.
 
 © 2015 [silverwind](https://github.com/silverwind), distributed under BSD licence

@@ -58,14 +58,13 @@ function connect() {
         if ((stats.failed + stats.success) >= opts.count) emitter.emit("end", stats);
     });
 
+    stats.sent++;
     socket.connect(port, host, function () {
         socket.end();
         stats.success++;
         emitter.emit("connect", seq, stats, ms(now() - start));
         if ((stats.failed + stats.success) >= opts.count) emitter.emit("end", stats);
     });
-
-    stats.sent++;
 }
 
 // get current timestamp in nanoseconds
