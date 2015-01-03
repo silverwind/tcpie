@@ -56,7 +56,7 @@ pie.on("connect", function(seq) {
 #### tcpie(host, [port], [options])
 - `host` *string* : the destination host name or IP address. Required.
 - `port` *number* : the destination port. Default: `80`.
-- `opts` *object* : options for count, interval and timeout. Defaults: `Infinity`, `1`, `3000`.
+- `opts` *object* : options for count, interval and timeout. Defaults: `Infinity`, `1000`, `3000`.
 
 #### Events
 - `connect` : Arguments: `seq`, `stats`, `details`, `rtt`. Connection attempt succeeded.
