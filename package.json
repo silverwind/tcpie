@@ -17,9 +17,12 @@
     "tcp",
     "port",
     "ping",
-    "test",
+    "network",
+    "networking",
     "connect",
-    "connection"
+    "connection",
+    "monitor",
+    "monitoring"
   ],
   "bin": {
     "tcpie": "tcpie.js"
