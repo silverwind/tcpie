@@ -85,7 +85,7 @@ function run(host, port, opts, hostname) {
             chalk.green((hostname || host) + ":" + port),
             chalk.yellow("seq=") + chalk.green(seq),
             chalk.yellow("srcport=") + chalk.green(details.localPort),
-            chalk.yellow("time=") + colorRTT(rtt.toFixed(1) + " ms"));
+            chalk.yellow("time=") + colorRTT(rtt.toFixed(1)));
     });
 
     pie.on("timeout", function (seq, st, details) {
@@ -139,11 +139,11 @@ function printEnd() {
 
 function colorRTT(rtt) {
     if (rtt >= 150)
-        return chalk.red(rtt);
+        return chalk.red(rtt + " ms");
     else if (rtt >= 75)
-        return chalk.yellow(rtt);
+        return chalk.yellow(rtt + " ms");
     else
-        return chalk.green(rtt);
+        return chalk.green(rtt + " ms");
 }
 
 function writeLine() {
