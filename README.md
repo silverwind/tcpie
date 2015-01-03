@@ -54,15 +54,15 @@ pie.on("connect", function(seq) {
 }).start();
 ```
 #### tcpie(host, [port], [options])
-- `host` *string* : the destination hostname or IP address.
-- `port` *number* : the destination port.
-- `opts` *object* : options for count, interval and timeout.
+- `host` *string* : the destination host name or IP address. Required.
+- `port` *number* : the destination port. Default: `80`.
+- `opts` *object* : options for count, interval and timeout. Defaults: `Infinity`, `1`, `3000`.
 
 #### Events
-- `error`   : Arguments: `seq`, `stats`, `details`, `err`. Connection error happens.
 - `connect` : Arguments: `seq`, `stats`, `details`, `rtt`. Connection attempt succeeded.
-- `timeout` : Arguments: `seq`, `stats`, `details`, . Connection attempt ran into the timeout.
-- `end`     : Arguments: `stats`. Emmitted when all attempts (defined by `count`) are finished.
+- `error`   : Arguments: `seq`, `stats`, `details`, `err`. Connection attempt failed.
+- `timeout` : Arguments: `seq`, `stats`, `details`. Connection attempt ran into the timeout.
+- `end`     : Arguments: `stats`. All connection attempts have finished.
 
 #### Event arguments
 - `seq`     *number* : current sequence number. Starting at 1.
