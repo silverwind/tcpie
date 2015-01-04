@@ -39,31 +39,41 @@ Tcpie.prototype.start = function start() {
 
     var socket    = new net.Socket(),
         startTime = now(),
-        seq       = stats.sent + 1;
+        seq       = stats.sent + 1,
+        done      = false;
 
     socket.setTimeout(opts.timeout);
 
     socket.on("timeout", function () {
-        instance.emit("timeout", seq, stats, details(socket));
-        socket.destroy();
-        stats.failed++;
-        checkEnd(instance);
+        if (!done) {
+            done = true;
+            instance.emit("timeout", seq, stats, details(socket));
+            socket.destroy();
+            stats.failed++;
+            checkEnd(instance);
+        }
     });
 
     socket.on("error", function (err) {
-        instance.emit("error", seq, stats, details(socket), err);
-        socket.destroy();
-        stats.failed++;
-        checkEnd(instance);
+        if (!done) {
+            done = true;
+            instance.emit("error", seq, stats, details(socket), err);
+            socket.destroy();
+            stats.failed++;
+            checkEnd(instance);
+        }
     });
 
     stats.sent++;
 
     socket.connect(instance.port, instance.host, function () {
-        instance.emit("connect", seq, stats, details(socket), ms(now() - startTime));
-        socket.end();
-        stats.success++;
-        checkEnd(instance);
+        if (!done) {
+            done = true;
+            instance.emit("connect", seq, stats, details(socket), ms(now() - startTime));
+            socket.end();
+            stats.success++;
+            checkEnd(instance);
+        }
     });
 
     return instance;
