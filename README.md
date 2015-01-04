@@ -44,7 +44,7 @@ $ npm install --save tcpie
 ###Example
 ```js
 var tcpie = require("tcpie");
-var pie = tcpie("google.com", 80, {count: 10, interval: 500, timeout: 2000})
+var pie = tcpie("google.com", 80, {count: 10, interval: 500, timeout: 2000});
 
 pie.on("connect", function(data) {
     console.log("connect", data);
