@@ -44,13 +44,20 @@ $ npm install --save tcpie
 ###Example
 ```js
 var tcpie = require("tcpie");
-var pie = tcpie("google.com", 80, {count: 10, interval: 500, timeout: 2000});
+var pie = tcpie("google.com", 80, {count: 10, interval: 500, timeout: 2000})
 
-pie.on("connect", function(seq) {
-    console.log("connect", seq);
-}).on("end", function(stats) {
-    console.log(stats);
-    // -> { sent: 10, success: 10, failed: 0 }
+pie.on("connect", function(data) {
+    console.log("connect", data);
+}).on("error", function(data, err) {
+    console.log("error", data, err);
+}).on("end", function(data) {
+    console.log("end", data);
+    // -> {
+    // ->   sent: 10,
+    // ->   success: 10,
+    // ->   failed: 0,
+    // ->   target: { host: 'google.com', port: 80 }
+    // -> }
 }).start();
 ```
 #### tcpie(host, [port], [options])
@@ -58,27 +65,29 @@ pie.on("connect", function(seq) {
 - `port` *number* : the destination port. Default: `80`.
 - `opts` *object* : options for count, interval and timeout. Defaults: `Infinity`, `1000`, `3000`.
 
-#### Events
-- `connect` : Arguments: `seq`, `stats`, `details`, `rtt`. Connection attempt succeeded.
-- `error`   : Arguments: `seq`, `stats`, `details`, `err`. Connection attempt failed.
-- `timeout` : Arguments: `seq`, `stats`, `details`. Connection attempt ran into the timeout.
-- `end`     : Arguments: `stats`. All connection attempts have finished.
-
-#### Event arguments
-- `seq`     *number* : current sequence number. Starting at 1.
-- `stats`   *object* : stats object descibed below.
-- `details` *object* : socket details, `localAddress`, `localPort`, `remoteAddress`, `remotePort`.
-- `rtt`     *number* : total time to establish handshake in milliseconds (not rounded).
-- `err`     *error*  : connection error on the `error` event.
-
 #### *options* object
 - `count`    *number* : the number of connection attempts in milliseconds (default: Infinity).
 - `interval` *number* : the interval between connection attempts in milliseconds (default: 1000).
 - `timeout`  *number* : the connection timeout in milliseconds (default: 3000).
 
-#### *stats* object
-- `sent`     *number* : total number of attempts made.
-- `success`  *number* : number of successfull attempts.
-- `failed`   *number* : number of failed attempts.
+#### Events
+- `connect` : Arguments: `data`. Connection attempt succeeded.
+- `timeout` : Arguments: `data`. Connection attempt ran into the timeout.
+- `error`   : Arguments: `data`, `err`. Connection attempt failed.
+- `end`     : Arguments: `stats`. All connection attempts have finished.
+
+#### *data* argument properties
+- `sent`    *number* : number of total attempts made.
+- `success` *number* : number of successfull attempts.
+- `failed`  *number* : number of failed attempts.
+- `rtt`     *number* : roundtrip time in milliseconds. *undefined* if failed.
+- `target`  *object* : target details: `host` and `port`.
+- `socket`  *object* : socket details: `localAddress`, `localPort`, `remoteAddress`, `remotePort`.
+
+#### *stats* argument properties
+- `sent`    *number* : number of total attempts made.
+- `success` *number* : number of successfull attempts.
+- `failed`  *number* : number of failed attempts.
+- `target`  *object* : target details: `host` and `port`.
 
 © 2015 [silverwind](https://github.com/silverwind), distributed under BSD licence

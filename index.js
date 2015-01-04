@@ -29,75 +29,89 @@ var Tcpie = function (host, port, opts) {
 util.inherits(Tcpie, events.EventEmitter);
 
 Tcpie.prototype.start = function start() {
-    var instance  = this,
-        stats     = this.stats,
-        opts      = this.opts;
+    var self = this;
 
-    if (stats.sent >= opts.count) return;
+    if (self.stats.sent >= self.opts.count) return;
+    self.stats.sent++;
 
-    instance.next = setTimeout(start.bind(this), opts.interval);
+    self._next = setTimeout(start.bind(self), self.opts.interval);
 
     var socket    = new net.Socket(),
         startTime = now(),
-        seq       = stats.sent + 1,
         done      = false;
 
-    socket.setTimeout(opts.timeout);
+    socket.setTimeout(self.opts.timeout);
 
     socket.on("timeout", function () {
         if (!done) {
             done = true;
-            instance.emit("timeout", seq, stats, details(socket));
+            self.stats.failed++;
+            self.emit("timeout", addDetails(self, this));
             socket.destroy();
-            stats.failed++;
-            checkEnd(instance);
+            checkEnd(self);
         }
     });
 
     socket.on("error", function (err) {
         if (!done) {
             done = true;
-            instance.emit("error", seq, stats, details(socket), err);
+            self.stats.failed++;
+            self.emit("error", addDetails(self, this), err);
             socket.destroy();
-            stats.failed++;
-            checkEnd(instance);
+            checkEnd(self);
         }
     });
 
-    stats.sent++;
-
-    socket.connect(instance.port, instance.host, function () {
+    socket.connect(self.port, self.host, function () {
         if (!done) {
             done = true;
-            instance.emit("connect", seq, stats, details(socket), ms(now() - startTime));
+            self.stats.success++;
+            self.stats.rtt = (now() - startTime) / 1e6;
+            self.emit("connect", addDetails(self, this));
             socket.end();
-            stats.success++;
-            checkEnd(instance);
+            checkEnd(self);
         }
     });
 
-    return instance;
+    return self;
 };
 
 module.exports = function (host, port, opts) {
     return new Tcpie(host, port, opts);
 };
 
-// construct details object
-function details(socket) {
-    return {
+// add details to stats object
+function addDetails(self, socket) {
+    var ret = self.stats;
+
+    ret.target = {
+        host: self.host,
+        port: self.port
+    };
+
+    ret.socket = {
         localAddress  : socket.localAddress,
         localPort     : socket.localPort,
         remoteAddress : socket.remoteAddress,
         remotePort    : socket.remotePort
     };
+
+    return ret;
 }
 
 // check end condition
-function checkEnd(instance) {
-    if ((instance.stats.failed + instance.stats.success) >= instance.opts.count) {
-        if (instance.next) clearTimeout(instance.next);
-        instance.emit("end", instance.stats);
+function checkEnd(self) {
+    if ((self.stats.failed + self.stats.success) >= self.opts.count) {
+        if (self._next) clearTimeout(self._next);
+        self.emit("end", {
+            sent   : self.stats.success + self.stats.failed,
+            success: self.stats.success,
+            failed : self.stats.failed,
+            target : {
+                host: self.host,
+                port: self.port
+            }
+        });
     }
 }
 
@@ -105,9 +119,4 @@ function checkEnd(instance) {
 function now() {
     var hrtime = process.hrtime();
     return hrtime[0] * 1e9 + hrtime[1];
-}
-
-// convert nanoseconds to milliseconds
-function ms(ns) {
-    return (ns / 1e6);
 }

@@ -33,11 +33,11 @@ if (!cmd.args.length || cmd.args.length > 2 || (cmd.args[1] && isNaN(parseInt(cm
     process.exit(1);
 }
 
-var opts   = {},
-    host   = cmd.args[0],
-    port   = parseInt(cmd.args[1], 10) || 80,
-    rtts   = [],
-    stats;
+var savedStats,
+    opts = {},
+    host = cmd.args[0],
+    port = parseInt(cmd.args[1], 10) || 80,
+    rtts = [];
 
 if (cmd.count) opts.count = parseInt(cmd.count, 10);
 if (cmd.interval) opts.interval = secondsToMs(cmd.interval);
@@ -50,7 +50,7 @@ if (!net.isIP(host)) {
     dns.lookup(host, function (err, address) {
         if (!err) {
             printStart(host, address, port);
-            run(host, port, opts, host);
+            run(host, port, opts);
         } else {
             if (err.code === "ENOTFOUND")
                 writeLine(chalk.red("ERROR:"), "Domain", host, "not found.");
@@ -61,46 +61,46 @@ if (!net.isIP(host)) {
     });
 } else {
     printStart(host, host, port);
-    run(host, port, opts, host);
+    run(host, port, opts);
 }
 
-function run(host, port, opts, hostname) {
+function run(host, port, opts) {
     var pie = tcpie(host, port, opts);
 
-    pie.on("error", function (seq, st, details, err) {
-        stats = st;
+    pie.on("error", function (data, err) {
+        savedStats = data;
         writeLine(
             chalk.red("error connecting to"),
-            chalk.red(hostname || host) + ":" + port,
-            chalk.yellow("seq=") + chalk.green(seq),
-            chalk.yellow("srcport=") + chalk.green(details.localPort),
-            chalk.red(err.code) || "");
+            chalk.red(data.target.host + ":" + data.target.port),
+            chalk.yellow("seq=") + chalk.green(data.sent),
+            chalk.yellow("srcport=") + chalk.green(data.socket.localPort),
+            chalk.red(err.code || "")
+        );
     });
 
-    pie.on("connect", function (seq, st, details, rtt) {
-        stats = st;
-        rtts.push(rtt);
+    pie.on("connect", function (data) {
+        savedStats = data;
+        rtts.push(data.rtt);
         writeLine(
             chalk.green("connected to"),
-            chalk.green((hostname || host) + ":" + port),
-            chalk.yellow("seq=") + chalk.green(seq),
-            chalk.yellow("srcport=") + chalk.green(details.localPort),
-            chalk.yellow("time=") + colorRTT(rtt.toFixed(1)));
+            chalk.green(data.target.host + ":" + data.target.port),
+            chalk.yellow("seq=") + chalk.green(data.sent),
+            chalk.yellow("srcport=") + chalk.green(data.socket.localPort),
+            chalk.yellow("time=") + colorRTT(data.rtt.toFixed(1))
+        );
     });
 
-    pie.on("timeout", function (seq, st, details) {
-        stats = st;
+    pie.on("timeout", function (data) {
+        savedStats = data;
         writeLine(
-                  chalk.red("timeout connecting to"),
-                  chalk.red((hostname || host) + ":" + port),
-                  chalk.yellow("seq=") + chalk.green(seq),
-                  chalk.yellow("srcport=") + chalk.green(details.localPort));
+              chalk.red("timeout connecting to"),
+              chalk.red(data.target.host + ":" + data.target.port),
+              chalk.yellow("seq=") + chalk.green(data.sent),
+              chalk.yellow("srcport=") + chalk.green(data.socket.localPort)
+        );
     });
 
-    pie.on("end", function (st) {
-        stats = st;
-        printEnd();
-    });
+    pie.on("end", printEnd);
 
     process.on("SIGINT", printEnd);
     process.on("SIGQUIT", printEnd);
@@ -113,8 +113,11 @@ function printStart(host, address, port) {
     writeLine(pkg.name.toUpperCase(), host, "(" + address + ")", "port", String(port));
 }
 
-function printEnd() {
+function printEnd(stats) {
     var sum = 0, min = Infinity, max = 0, avg, sd;
+
+    if (!stats)
+        stats = savedStats;
 
     if (rtts.length) {
         rtts.forEach(function (rtt) {
@@ -130,7 +133,7 @@ function printEnd() {
         if (isNaN(sd)) sd = 0;
 
         writeLine("\n---", host, pkg.name + " statistics", "---");
-        writeLine(stats.sent, "handshakes attempted,", stats.success, "succeeded,",
+        writeLine(stats.success + stats.failed, "handshakes attempted,", stats.success, "succeeded,",
             ((stats.failed / stats.sent) * 100).toFixed(0) + "% failed");
         writeLine("rtt min/avg/max/stdev =", min + "/" + avg + "/" + max + "/" + sd, "ms");
     }
