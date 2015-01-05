@@ -133,7 +133,7 @@ function printEnd(stats) {
         if (isNaN(sd)) sd = 0;
 
         writeLine("\n---", host, pkg.name + " statistics", "---");
-        writeLine(stats.success + stats.failed, "handshakes attempted,", stats.success, "succeeded,",
+        writeLine(stats.sent, "handshakes attempted,", stats.success, "succeeded,",
             ((stats.failed / stats.sent) * 100).toFixed(0) + "% failed");
         writeLine("rtt min/avg/max/stdev =", min + "/" + avg + "/" + max + "/" + sd, "ms");
     }

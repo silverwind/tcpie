@@ -31,8 +31,7 @@ util.inherits(Tcpie, events.EventEmitter);
 Tcpie.prototype.start = function start() {
     var self = this;
 
-    if (self.stats.sent >= self.opts.count) return;
-    self.stats.sent++;
+    if (self.stats.sent + 1 >= self.opts.count) return;
 
     self._next = setTimeout(start.bind(self), self.opts.interval);
 
@@ -45,6 +44,7 @@ Tcpie.prototype.start = function start() {
     socket.on("timeout", function () {
         if (!done) {
             done = true;
+            self.stats.sent++;
             self.stats.failed++;
             self.emit("timeout", addDetails(self, this));
             socket.destroy();
@@ -55,6 +55,7 @@ Tcpie.prototype.start = function start() {
     socket.on("error", function (err) {
         if (!done) {
             done = true;
+            self.stats.sent++;
             self.stats.failed++;
             self.emit("error", addDetails(self, this), err);
             socket.destroy();
@@ -65,6 +66,7 @@ Tcpie.prototype.start = function start() {
     socket.connect(self.port, self.host, function () {
         if (!done) {
             done = true;
+            self.stats.sent++;
             self.stats.success++;
             self.stats.rtt = (now() - startTime) / 1e6;
             self.emit("connect", addDetails(self, this));
