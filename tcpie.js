@@ -73,8 +73,7 @@ function run(host, port, opts) {
             chalk.red("error connecting to"),
             chalk.red(data.target.host + ":" + data.target.port),
             chalk.yellow("seq=") + chalk.green(data.sent),
-            chalk.yellow("srcport=") + chalk.green(data.socket.localPort),
-            chalk.red(err.code || "")
+            chalk.yellow("error=") + chalk.red(err.code)
         );
     });
 
