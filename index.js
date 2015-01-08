@@ -33,10 +33,7 @@ Tcpie.prototype.start = function start() {
 
     if (self.stats.sent + 1 >= self.opts.count) return;
 
-    if (self.opts.interval === 0)
-        self._nextImmediate = setImmediate(start.bind(self));
-    else
-        self._next = setTimeout(start.bind(self), self.opts.interval);
+    self._next = setTimeout(start.bind(self), self.opts.interval);
 
     var socket    = new net.Socket(),
         startTime = now(),
@@ -109,8 +106,6 @@ function checkEnd(self) {
     if ((self.stats.failed + self.stats.success) >= self.opts.count) {
         if (self._next)
             clearTimeout(self._next);
-        else if (self._nextImmediate)
-            clearImmediate(self._next);
 
         self.emit("end", {
             sent   : self.stats.sent,
