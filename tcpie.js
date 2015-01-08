@@ -100,7 +100,7 @@ function run(host, port, opts) {
               chalk.red("timeout connecting to"),
               chalk.red(data.target.host + ":" + data.target.port),
               chalk.yellow("seq=") + chalk.green(data.sent),
-              chalk.yellow("srcport=") + chalk.green(data.socket.localPort)
+              data.socket.localPort && chalk.yellow("srcport=") + chalk.green(data.socket.localPort)
         );
     });
 
@@ -152,6 +152,7 @@ function colorRTT(rtt) {
 
 function writeLine() {
     var args = Array.prototype.slice.call(arguments);
+    args = args.filter(function (string) { return Boolean(string); });
     args.push("\n");
     process.stdout.write(args.join(" "));
 }
