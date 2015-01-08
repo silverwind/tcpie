@@ -18,7 +18,7 @@ cmd
     .usage("[options] host [port]")
     .option("-c, --count <n>", "number of connects (default: Infinte)", parseInt)
     .option("-i, --interval <n>", "wait n seconds between connects (default: 1)", parseFloat)
-    .option("-t, --timeout <n>", "connection timeout in seconds (default: 3)", parseInt)
+    .option("-t, --timeout <n>", "connection timeout in seconds (default: 3)", parseFloat)
     .option("-f, --flood", "flood mode, connect as fast as possible")
     .option("--color", "enable color output")
     .on("--help", function () {
@@ -46,7 +46,7 @@ var host    = cmd.args[0],
 
 if (cmd.count) opts.count = parseInt(cmd.count, 10);
 if (cmd.interval) opts.interval = secondsToMs(cmd.interval);
-if (cmd.timeout) opts.count = secondsToMs(cmd.timeout);
+if (cmd.timeout) opts.timeout = secondsToMs(cmd.timeout);
 if (cmd.flood) opts.interval = 0;
 if (!cmd.color) chalk.enabled = false;
 
