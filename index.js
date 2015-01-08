@@ -107,8 +107,11 @@ function addDetails(self, socket) {
 // check end condition
 function checkEnd(self) {
     if ((self.stats.failed + self.stats.success) >= self.opts.count) {
-        if (self._next) clearTimeout(self._next);
-        if (self._nextImmediate) clearImmediate(self._next);
+        if (self._next)
+            clearTimeout(self._next);
+        else if (self._nextImmediate)
+            clearImmediate(self._next);
+
         self.emit("end", {
             sent   : self.stats.sent,
             success: self.stats.success,
