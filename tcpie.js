@@ -9,6 +9,10 @@ var cmd    = require("commander"),
     stdev  = require("compute-stdev"),
     tcpie  = require("./");
 
+var DIGITS_LINE  = 1,
+    DIGITS_STATS = 3,
+    DIGITS_PERC  = 0;
+
 cmd
     .version(pkg.version)
     .usage("[options] host [port]")
@@ -33,11 +37,12 @@ if (!cmd.args.length || cmd.args.length > 2 || (cmd.args[1] && isNaN(parseInt(cm
     process.exit(1);
 }
 
-var savedStats,
-    opts = {},
-    host = cmd.args[0],
-    port = parseInt(cmd.args[1], 10) || 80,
-    rtts = [];
+var host    = cmd.args[0],
+    opts    = {},
+    port    = parseInt(cmd.args[1], 10) || 80,
+    printed = false,
+    rtts    = [],
+    stats;
 
 if (cmd.count) opts.count = parseInt(cmd.count, 10);
 if (cmd.interval) opts.interval = secondsToMs(cmd.interval);
@@ -68,7 +73,7 @@ function run(host, port, opts) {
     var pie = tcpie(host, port, opts);
 
     pie.on("error", function (data, err) {
-        savedStats = data;
+        stats = data;
         writeLine(
             chalk.red("error connecting to"),
             chalk.red(data.target.host + ":" + data.target.port),
@@ -78,19 +83,19 @@ function run(host, port, opts) {
     });
 
     pie.on("connect", function (data) {
-        savedStats = data;
+        stats = data;
         rtts.push(data.rtt);
         writeLine(
             chalk.green("connected to"),
             chalk.green(data.target.host + ":" + data.target.port),
             chalk.yellow("seq=") + chalk.green(data.sent),
             chalk.yellow("srcport=") + chalk.green(data.socket.localPort),
-            chalk.yellow("time=") + colorRTT(data.rtt.toFixed(1))
+            chalk.yellow("time=") + colorRTT(data.rtt.toFixed(DIGITS_LINE))
         );
     });
 
     pie.on("timeout", function (data) {
-        savedStats = data;
+        stats = data;
         writeLine(
               chalk.red("timeout connecting to"),
               chalk.red(data.target.host + ":" + data.target.port),
@@ -99,42 +104,39 @@ function run(host, port, opts) {
         );
     });
 
-    pie.on("end", printEnd);
-
+    process.on("exit", printEnd);
     process.on("SIGINT", printEnd);
     process.on("SIGQUIT", printEnd);
     process.on("SIGTERM", printEnd);
-
-    pie.start();
+    pie.on("end", printEnd).start();
 }
 
 function printStart(host, address, port) {
     writeLine(pkg.name.toUpperCase(), host, "(" + address + ")", "port", String(port));
 }
 
-function printEnd(stats) {
-    var sum = 0, min = Infinity, max = 0, avg, sd;
+function printEnd() {
+    var sum = 0, min = Infinity, max = 0, avg, dev;
 
-    if (!stats)
-        stats = savedStats;
+    if (printed)
+        process.exit(0);
 
     if (rtts.length) {
         rtts.forEach(function (rtt) {
-            if (rtt <= min) min = rtt.toFixed(3);
-            if (rtt >= max) max = rtt.toFixed(3);
+            if (rtt <= min) min = rtt.toFixed(DIGITS_STATS);
+            if (rtt >= max) max = rtt.toFixed(DIGITS_STATS);
             sum += rtt;
         });
 
-        avg = (sum / rtts.length).toFixed(3);
-        if (isNaN(avg)) avg = 0;
+        avg = (sum / rtts.length).toFixed(DIGITS_STATS);
+        dev = stdev(rtts).toFixed(DIGITS_STATS);
 
-        sd = stdev(rtts).toFixed(3);
-        if (isNaN(sd)) sd = 0;
+        printed = true;
 
-        writeLine("\n---", host, pkg.name + " statistics", "---");
-        writeLine(stats.sent, "handshakes attempted,", stats.success, "succeeded,",
-            ((stats.failed / stats.sent) * 100).toFixed(0) + "% failed");
-        writeLine("rtt min/avg/max/stdev =", min + "/" + avg + "/" + max + "/" + sd, "ms");
+        writeLine("\n---", host, pkg.name + " statistics", "---",
+                  "\n", stats.sent, "handshakes attempted,", stats.success, "succeeded,",
+                  ((stats.failed / stats.sent) * 100).toFixed(DIGITS_PERC) + "% failed",
+                  "\nrtt min/avg/max/stdev =", min + "/" + avg + "/" + max + "/" + dev, "ms");
     }
     process.exit(0);
 }

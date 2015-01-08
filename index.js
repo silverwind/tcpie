@@ -106,7 +106,7 @@ function checkEnd(self) {
     if ((self.stats.failed + self.stats.success) >= self.opts.count) {
         if (self._next) clearTimeout(self._next);
         self.emit("end", {
-            sent   : self.stats.success + self.stats.failed,
+            sent   : self.stats.sent,
             success: self.stats.success,
             failed : self.stats.failed,
             target : {
