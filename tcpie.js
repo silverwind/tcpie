@@ -16,7 +16,7 @@ var DIGITS_LINE  = 1,
 cmd
     .version(pkg.version)
     .usage("[options] host [port]")
-    .option("-c, --count <n>", "number of connects (default: Infinte)", parseInt)
+    .option("-c, --count <n>", "number of connects (default: infinite)", parseInt)
     .option("-i, --interval <n>", "wait n seconds between connects (default: 1)", parseFloat)
     .option("-t, --timeout <n>", "connection timeout in seconds (default: 3)", parseFloat)
     .option("-f, --flood", "flood mode, connect as fast as possible")

@@ -29,7 +29,7 @@ Options:
 
   -h, --help          output usage information
   -V, --version       output the version number
-  -c, --count <n>     number of connects (default: Infinte)
+  -c, --count <n>     number of connects (default: infinite)
   -i, --interval <n>  wait n seconds between connects (default: 1)
   -t, --timeout <n>   connection timeout in seconds (default: 3)
   -f, --flood         flood mode, connect as fast as possible
