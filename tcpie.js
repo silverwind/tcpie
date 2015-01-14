@@ -121,7 +121,7 @@ function printEnd() {
     if (printed)
         process.exit(0);
 
-    if (rtts.length) {
+    if (stats && stats.sent > 0) {
         rtts.forEach(function (rtt) {
             if (rtt <= min) min = rtt.toFixed(DIGITS_STATS);
             if (rtt >= max) max = rtt.toFixed(DIGITS_STATS);
@@ -131,10 +131,13 @@ function printEnd() {
         avg = (sum / rtts.length).toFixed(DIGITS_STATS);
         dev = stdev(rtts).toFixed(DIGITS_STATS);
 
+        if (min === Infinity) min = "0";
+        if (isNaN(avg)) avg = "0";
+
         printed = true;
 
         writeLine("\n---", host, pkg.name + " statistics", "---",
-                  "\n", stats.sent, "handshakes attempted,", stats.success, "succeeded,",
+                  "\n" + stats.sent, "handshakes attempted,", stats.success || "0", "succeeded,",
                   ((stats.failed / stats.sent) * 100).toFixed(DIGITS_PERC) + "% failed",
                   "\nrtt min/avg/max/stdev =", min + "/" + avg + "/" + max + "/" + dev, "ms");
     }
