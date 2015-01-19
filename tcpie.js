@@ -105,9 +105,9 @@ function run(host, port, opts) {
     });
 
     process.on("exit", printEnd);
-    process.on("SIGINT", printEnd);
-    process.on("SIGQUIT", printEnd);
-    process.on("SIGTERM", printEnd);
+    process.on("SIGINT", process.exit);
+    process.on("SIGQUIT", process.exit);
+    process.on("SIGTERM", process.exit);
     pie.on("end", printEnd).start();
 }
 
@@ -154,10 +154,11 @@ function colorRTT(rtt) {
 }
 
 function writeLine() {
-    var args = Array.prototype.slice.call(arguments);
+    var args = Array.prototype.slice.call(arguments), stream;
     args = args.filter(function (string) { return Boolean(string); });
     args.push("\n");
-    process.stdout.write(args.join(" "));
+    stream = (process.stdout._type === "pipe" && printed) ? process.stderr : process.stdout;
+    stream.write(args.join(" "));
 }
 
 // convert seconds to milliseconds
