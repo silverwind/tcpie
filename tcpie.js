@@ -14,7 +14,8 @@ var cmd    = require("commander"),
 
 var DIGITS_LINE  = 1,
     DIGITS_STATS = 3,
-    DIGITS_PERC  = 0;
+    DIGITS_PERC  = 0,
+    DEFAULT_PORT = 80;
 
 cmd
     .version(pkg.version)
@@ -25,7 +26,9 @@ cmd
     .option("-f, --flood", "flood mode, connect as fast as possible")
     .option("--color", "enable color output")
     .on("--help", function () {
-        writeLine("  Note: port defaults to 80");
+        writeLine("  Notes:");
+        writeLine("    -  host:port syntax is supported");
+        writeLine("    -  port defaults to 80");
         writeLine();
         writeLine("  Examples:");
         writeLine();
@@ -42,11 +45,19 @@ if (!cmd.args.length || cmd.args.length > 2 || (cmd.args[1] && isNaN(parseInt(cm
 
 var host    = cmd.args[0],
     opts    = {},
-    port    = parseInt(cmd.args[1], 10) || 80,
+    port    = parseInt(cmd.args[1], 10),
     printed = false,
     rtts    = [],
     stats;
 
+// host:port syntax
+var matches = host.match(/^(.+):(.+)$/);
+if (matches && matches.length === 3 && !port) {
+    host = matches[1];
+    port = matches[2];
+}
+
+if (!port) port = DEFAULT_PORT;
 if (cmd.count) opts.count = parseInt(cmd.count, 10);
 if (cmd.interval) opts.interval = secondsToMs(cmd.interval);
 if (cmd.timeout) opts.timeout = secondsToMs(cmd.timeout);
