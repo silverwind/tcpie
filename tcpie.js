@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 "use strict";
 
+var pkg    = require("./package.json");
+
+process.name = pkg.name;
+
 var cmd    = require("commander"),
     chalk  = require("chalk"),
     net    = require("net"),
     dns    = require("dns"),
-    pkg    = require("./package.json"),
     stdev  = require("compute-stdev"),
     tcpie  = require("./");
 
