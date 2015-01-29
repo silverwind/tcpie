@@ -3,11 +3,11 @@
 
 tcpie is an simple tool to verify the reliabilty of a network connection to a remote server. It does so by initiating a handshake and immediately terminating the connection afterwards. It was created because similar tools like `hping` require raw socket access (usually only granted to root), while tcpie runs fine in userspace. Further, an API is provided for use as a module.
 
-##Installation
+## Installation
 ```
 $ [sudo] npm install -g tcpie
 ```
-###Example
+### Example
 ```
 $ tcpie -c 5 google.com
 TCPIE google.com (188.21.9.116) port 80
@@ -21,7 +21,7 @@ connected to google.com:80 seq=5 srcport=3242 time=28.5 ms
 5 handshakes attempted, 5 succeeded, 0% failed
 rtt min/avg/max/stdev = 25.757/28.835/31.908/2.184 ms
 ```
-##Usage
+## Usage
 ```
 Usage: tcpie [options] host [port]
 
@@ -36,12 +36,12 @@ Options:
   --color             enable color output
 ```
 
-##Module API
-###Installation
+## Module API
+### Installation
 ```
 $ npm install --save tcpie
 ```
-###Example
+### Example
 ```js
 var tcpie = require("tcpie");
 var pie = tcpie("google.com", 80, {count: 10, interval: 500, timeout: 2000});
