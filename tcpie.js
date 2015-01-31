@@ -18,8 +18,11 @@ var DIGITS_LINE  = 1,
     DEFAULT_PORT = 80;
 
 cmd
-    .version(pkg.version)
     .usage("[options] host [port]")
+    .option("-v, --version", "output the version number", function  () {
+        writeLine(pkg.version);
+        process.exit(0);
+    })
     .option("-c, --count <n>", "number of connects (default: infinite)", parseInt)
     .option("-i, --interval <n>", "wait n seconds between connects (default: 1)", parseFloat)
     .option("-t, --timeout <n>", "connection timeout in seconds (default: 3)", parseFloat)
