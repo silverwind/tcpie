@@ -19,7 +19,7 @@ var DIGITS_LINE  = 1,
 
 cmd
     .usage("[options] host [port]")
-    .option("-v, --version", "output the version number", function  () {
+    .option("-v, --version", "output the version number", function () {
         writeLine(pkg.version);
         process.exit(0);
     })

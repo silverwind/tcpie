@@ -31,7 +31,7 @@ util.inherits(Tcpie, events.EventEmitter);
 Tcpie.prototype.start = function start() {
     var self = this;
 
-    if (self.stats.sent + 1 >= self.opts.count) return;
+    if (self.stats.sent >= self.opts.count) return;
 
     self._next = setTimeout(start.bind(self), self.opts.interval);
 
