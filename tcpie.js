@@ -3,7 +3,7 @@
 
 var pkg    = require("./package.json");
 
-process.name = pkg.name;
+process.title = pkg.name;
 
 var cmd    = require("commander"),
     chalk  = require("chalk"),
@@ -30,6 +30,7 @@ cmd
     .option("--color", "enable color output")
     .on("--help", function () {
         writeLine("  Notes:");
+        writeLine("");
         writeLine("    -  host:port syntax is supported");
         writeLine("    -  port defaults to 80");
         writeLine();
