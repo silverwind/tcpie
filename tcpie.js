@@ -30,6 +30,7 @@ cmd
     .option("-c, --count <n>", "number of connects (default: infinite)", parseInt)
     .option("-i, --interval <n>", "wait n seconds between connects (default: 1)", parseFloat)
     .option("-t, --timeout <n>", "connection timeout in seconds (default: 3)", parseFloat)
+    .option("-T, --timestamp", "add timestamps to output")
     .option("-f, --flood", "flood mode, connect as fast as possible")
     .option("--color", "enable color output")
     .on("--help", function () {
@@ -168,8 +169,9 @@ function colorRTT(rtt) {
 }
 
 function writeLine() {
-    var args = Array.prototype.slice.call(arguments), stream;
+    var args = [].slice.call(arguments), stream;
     args = args.filter(function (string) { return Boolean(string); });
+    if (cmd.timestamp && args[0][0] !== "\n") args.unshift(timestamp());
     args.push("\n");
     stream = (process.stdout._type === "pipe" && printed) ? process.stderr : process.stdout;
     stream.write(args.join(" "));
@@ -179,3 +181,16 @@ function writeLine() {
 function secondsToMs(s) {
     return (parseFloat(s) * 1000);
 }
+
+function timestamp() {
+    var now = new Date(), day = now.getDate(), month = now.getMonth() + 1,
+        year = now.getFullYear(), hrs = now.getHours(), mins = now.getMinutes(),
+        secs = now.getSeconds();
+
+    if (month < 10) month = "0" + month;
+    if (day   < 10) day   = "0" + day;
+    if (hrs   < 10) hrs   = "0" + hrs;
+    if (mins  < 10) mins  = "0" + mins;
+    if (secs  < 10) secs  = "0" + secs;
+    return year + "-"  + month + "-" + day + " " + hrs + ":" + mins + ":" + secs;
+};
