@@ -32,7 +32,7 @@ cmd
     .option("-t, --timeout <n>", "connection timeout in seconds (default: 3)", parseFloat)
     .option("-T, --timestamp", "add timestamps to output")
     .option("-f, --flood", "flood mode, connect as fast as possible")
-    .option("--color", "enable color output")
+    .option("-C, --no-color", "disable color output")
     .on("--help", function () {
         writeLine("  Notes:");
         writeLine("");
@@ -81,7 +81,7 @@ if (!net.isIP(host)) {
             run(host, port, opts);
         } else {
             if (err.code === "ENOTFOUND")
-                writeLine(chalk.red("ERROR:"), "Domain", host, "not found.");
+                writeLine(chalk.red("ERROR:"), "Host '" + host + "' not found");
             else
                 writeLine(chalk.red("ERROR:"), err.code, err.syscall || "");
             process.exit(1);
