@@ -97,10 +97,9 @@ function run(host, port, opts) {
     pie.on("error", function (data, err) {
         stats = data;
         writeLine(
-            chalk.red("error connecting to"),
-            chalk.red(data.target.host + ":" + data.target.port),
-            chalk.yellow("seq=") + chalk.green(data.sent),
-            chalk.yellow("error=") + chalk.red(err.code)
+            chalk.red("error connecting to", data.target.host + ":" + data.target.port),
+            "seq=" + data.sent,
+            "error=" + chalk.red(err.code)
         );
     });
 
@@ -108,21 +107,19 @@ function run(host, port, opts) {
         stats = data;
         rtts.push(data.rtt);
         writeLine(
-            chalk.green("connected to"),
-            chalk.green(data.target.host + ":" + data.target.port),
-            chalk.yellow("seq=") + chalk.green(data.sent),
-            chalk.yellow("srcport=") + chalk.green(data.socket.localPort),
-            chalk.yellow("time=") + colorRTT(data.rtt.toFixed(DIGITS_LINE))
+            chalk.green("connected to", data.target.host + ":" + data.target.port),
+            "seq=" + data.sent,
+            "srcport=" + data.socket.localPort,
+            "time=" + colorRTT(data.rtt.toFixed(DIGITS_LINE))
         );
     });
 
     pie.on("timeout", function (data) {
         stats = data;
         writeLine(
-              chalk.red("timeout connecting to"),
-              chalk.red(data.target.host + ":" + data.target.port),
-              chalk.yellow("seq=") + chalk.green(data.sent),
-              data.socket.localPort && chalk.yellow("srcport=") + chalk.green(data.socket.localPort)
+            chalk.red("timeout connecting to", data.target.host + ":" + data.target.port),
+            "seq=" + data.sent,
+            data.socket.localPort && "srcport=" + data.socket.localPort
         );
     });
 
@@ -167,12 +164,7 @@ function printEnd() {
 }
 
 function colorRTT(rtt) {
-    if (rtt >= 150)
-        return chalk.red(rtt + " ms");
-    else if (rtt >= 75)
-        return chalk.yellow(rtt + " ms");
-    else
-        return chalk.green(rtt + " ms");
+    return chalk[rtt >= 150 ? "red" : rtt >= 75 ? "yellow" : "green"](rtt) + " ms";
 }
 
 function writeLine() {
