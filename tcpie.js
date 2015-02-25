@@ -193,4 +193,4 @@ function timestamp() {
     if (mins  < 10) mins  = "0" + mins;
     if (secs  < 10) secs  = "0" + secs;
     return year + "-"  + month + "-" + day + " " + hrs + ":" + mins + ":" + secs;
-};
+}
