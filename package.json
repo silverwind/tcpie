@@ -1,6 +1,6 @@
 {
   "name": "tcpie",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "'ping'-like utility to repeatedly test a remote TCP port for connectivity",
   "author": "silverwind <me@silverwind.io> (https://github.com/silverwind)",
   "homepage": "https://github.com/silverwind/tcpie",
