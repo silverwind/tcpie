@@ -3,16 +3,14 @@
   "version": "0.14.1",
   "description": "'ping'-like utility to repeatedly test a remote TCP port for connectivity",
   "author": "silverwind <me@silverwind.io> (https://github.com/silverwind)",
+  "homepage": "https://github.com/silverwind/tcpie",
+  "bugs": "https://github.com/silverwind/tcpie/issues",
   "license": "BSD-2-clause",
-  "bugs": {
-    "url": "https://github.com/silverwind/tcpie/issues"
-  },
-  "main": "index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/silverwind/tcpie"
   },
-  "homepage": "https://github.com/silverwind/tcpie",
+  "bin": "tcpie.js",
   "keywords": [
     "tcp",
     "port",
@@ -24,9 +22,6 @@
     "monitor",
     "monitoring"
   ],
-  "bin": {
-    "tcpie": "tcpie.js"
-  },
   "dependencies": {
     "chalk": "^1.0.0",
     "commander": "^2.6.0",
