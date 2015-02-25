@@ -31,7 +31,8 @@
     "chalk": "^0.5.1",
     "commander": "^2.6.0",
     "compute-stdev": "^1.0.0",
-    "defaults": "^1.0.0"
+    "defaults": "^1.0.0",
+    "epipebomb": "^0.1.1"
   },
   "devDependencies": {
     "grunt": "^0.4.5",

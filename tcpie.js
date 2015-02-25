@@ -1,9 +1,13 @@
 #!/usr/bin/env node
 "use strict";
 
-var pkg    = require("./package.json");
+var pkg = require("./package.json");
 
+// set process name
 process.title = pkg.name;
+
+// avoid EPIPE on partially consumed streams
+require("epipebomb")();
 
 var cmd    = require("commander"),
     chalk  = require("chalk"),
