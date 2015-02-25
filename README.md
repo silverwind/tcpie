@@ -32,8 +32,9 @@ Options:
   -c, --count <n>     number of connects (default: infinite)
   -i, --interval <n>  wait n seconds between connects (default: 1)
   -t, --timeout <n>   connection timeout in seconds (default: 3)
+  -T, --timestamp     add timestamps to output
   -f, --flood         flood mode, connect as fast as possible
-  --color             enable color output
+  -C, --no-color      disable color output
 ```
 
 ## Module API
@@ -47,17 +48,17 @@ var tcpie = require("tcpie");
 var pie = tcpie("google.com", 80, {count: 10, interval: 500, timeout: 2000});
 
 pie.on("connect", function(data) {
-    console.log("connect", data);
+  console.log("connect", data);
 }).on("error", function(data, err) {
-    console.log("error", data, err);
+  console.log("error", data, err);
 }).on("end", function(data) {
-    console.log("end", data);
-    // -> {
-    // ->   sent: 10,
-    // ->   success: 10,
-    // ->   failed: 0,
-    // ->   target: { host: 'google.com', port: 80 }
-    // -> }
+  console.log("end", data);
+  // -> {
+  // ->   sent: 10,
+  // ->   success: 10,
+  // ->   failed: 0,
+  // ->   target: { host: 'google.com', port: 80 }
+  // -> }
 }).start();
 ```
 #### tcpie(host, [port], [options])
