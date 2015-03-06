@@ -39,7 +39,6 @@ Tcpie.prototype.start = function start() {
         startTime = now(),
         done      = false;
 
-    socket.setNoDelay(true);
     socket.setTimeout(self.opts.timeout);
     socket.on("timeout", function () {
         if (!done) {
