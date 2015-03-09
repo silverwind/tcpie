@@ -48,11 +48,13 @@ var tcpie = require("tcpie");
 var pie = tcpie("google.com", 80, {count: 10, interval: 500, timeout: 2000});
 
 pie.on("connect", function(data) {
-  console.log("connect", data);
+  console.info("connect", data);
 }).on("error", function(data, err) {
-  console.log("error", data, err);
-}).on("end", function(data) {
-  console.log("end", data);
+  console.error(err, data);
+}).on("timeout", function(data) {
+  console.info("timeout", data);
+}).on("end", function(stats) {
+  console.info(stats);
   // -> {
   // ->   sent: 10,
   // ->   success: 10,
