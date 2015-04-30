@@ -1,11 +1,7 @@
 # tcpie [![NPM version](https://img.shields.io/npm/v/tcpie.svg?style=flat)](https://www.npmjs.org/package/tcpie) [![Dependency Status](http://img.shields.io/david/silverwind/tcpie.svg?style=flat)](https://david-dm.org/silverwind/tcpie)
-> 'ping'-like utility to repeatedly test a remote TCP port for connectivity
+> ping-like tool to test a TCP connection
 
-tcpie is a simple tool to verify the reliabilty of a TCP network connection. It does so by initiating a handshake followed by an immediately termination of the socket.
-
-The prime motivation to creating tcpie was that existing tools like `hping` require raw socket access (usually only granted to root), while tcpie runs fine in user space.
-
-A API for programmatic use as a module is also provided.
+tcpie is a tool to measure latency and verify the reliabilty of a TCP connection. It does so by initiating a handshake followed by an immediately termination of the socket. While many existing tools require raw socket access, tcpie runs fine in user space. An API for use as a module is also provided.
 
 ## Installation
 ```
