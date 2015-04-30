@@ -1,7 +1,11 @@
 # tcpie [![NPM version](https://img.shields.io/npm/v/tcpie.svg?style=flat)](https://www.npmjs.org/package/tcpie) [![Dependency Status](http://img.shields.io/david/silverwind/tcpie.svg?style=flat)](https://david-dm.org/silverwind/tcpie)
 > 'ping'-like utility to repeatedly test a remote TCP port for connectivity
 
-tcpie is an simple tool to verify the reliabilty of a network connection to a remote server. It does so by initiating a handshake and immediately terminating the connection afterwards. It was created because similar tools like `hping` require raw socket access (usually only granted to root), while tcpie runs fine in userspace. Further, an API is provided for use as a module.
+tcpie is a simple tool to verify the reliabilty of a TCP network connection. It does so by initiating a handshake followed by an immediately termination of the socket.
+
+The prime motivation to creating tcpie was that existing tools like `hping` require raw socket access (usually only granted to root), while tcpie runs fine in user space.
+
+A API for programmatic use as a module is also provided.
 
 ## Installation
 ```
@@ -44,16 +48,16 @@ $ npm install --save tcpie
 ```
 ### Example
 ```js
-var tcpie = require("tcpie");
-var pie = tcpie("google.com", 80, {count: 10, interval: 500, timeout: 2000});
+var tcpie = require('tcpie');
+var pie = tcpie('google.com', 80, {count: 10, interval: 500, timeout: 2000});
 
-pie.on("connect", function(data) {
-  console.info("connect", data);
-}).on("error", function(data, err) {
+pie.on('connect', function(data) {
+  console.info('connect', data);
+}).on('error', function(data, err) {
   console.error(err, data);
-}).on("timeout", function(data) {
-  console.info("timeout", data);
-}).on("end", function(stats) {
+}).on('timeout', function(data) {
+  console.info('timeout', data);
+}).on('end', function(stats) {
   console.info(stats);
   // -> {
   // ->   sent: 10,
