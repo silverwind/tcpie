@@ -125,9 +125,10 @@ function run(host, port, opts) {
     });
 
     process.on("exit", printEnd);
-    process.on("SIGINT", process.exit);
-    process.on("SIGQUIT", process.exit);
-    process.on("SIGTERM", process.exit);
+    process.stdin.setRawMode(true);
+    process.stdin.on("data", function (bytes) {
+        if (bytes[0] === 3 || bytes[0] === 4) process.exit();
+    });
     pie.on("end", printEnd).start();
 }
 
