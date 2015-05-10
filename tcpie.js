@@ -40,7 +40,7 @@ var usage = [
     "",
     "      $ tcpie www.google.com",
     "      $ tcpie -i .1 8.8.8.8:53",
-    "      $ tcpie -c 10 -t .05 aspmx.l.google.com 25",
+    "      $ tcpie -c5 -t.05 aspmx.l.google.com 25",
     "",
     ""].join("\n");
 

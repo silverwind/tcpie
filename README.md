@@ -23,12 +23,11 @@ rtt min/avg/max/stdev = 25.757/28.835/31.908/2.184 ms
 ```
 ## Usage
 ```
-Usage: tcpie [options] host [port]
+Usage: tcpie [options] host[:port] [port|80]
 
 Options:
 
-  -h, --help          output usage information
-  -v, --version       output the version number
+  -v, --version       output version
   -c, --count <n>     number of connects (default: infinite)
   -i, --interval <n>  wait n seconds between connects (default: 1)
   -t, --timeout <n>   connection timeout in seconds (default: 3)
