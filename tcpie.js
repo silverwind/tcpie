@@ -3,75 +3,79 @@
 
 var pkg = require("./package.json");
 
-// set process name
+// set process title
 process.title = pkg.name;
 
 // avoid EPIPE on partially consumed streams
 require("epipebomb")();
 
-var cmd    = require("commander"),
+var args   = require("minimist")(process.argv.slice(2)),
     chalk  = require("chalk"),
     net    = require("net"),
     dns    = require("dns"),
     stdev  = require("compute-stdev"),
     tcpie  = require("./");
 
+
 var DIGITS_LINE  = 1,
     DIGITS_STATS = 3,
     DIGITS_PERC  = 0,
     DEFAULT_PORT = 80;
 
-cmd
-    .usage("[options] host [port]")
-    .option("-v, --version", "output the version number", function () {
-        writeLine(pkg.version);
-        process.exit(0);
-    })
-    .option("-c, --count <n>", "number of connects (default: infinite)", parseInt)
-    .option("-i, --interval <n>", "wait n seconds between connects (default: 1)", parseFloat)
-    .option("-t, --timeout <n>", "connection timeout in seconds (default: 3)", parseFloat)
-    .option("-T, --timestamp", "add timestamps to output")
-    .option("-f, --flood", "flood mode, connect as fast as possible")
-    .option("-C, --no-color", "disable color output")
-    .on("--help", function () {
-        writeLine("  Notes:");
-        writeLine("");
-        writeLine("    -  host:port syntax is supported");
-        writeLine("    -  port defaults to 80");
-        writeLine();
-        writeLine("  Examples:");
-        writeLine();
-        writeLine("    $", pkg.name, "-c 5 google.com");
-        writeLine("    $", pkg.name, "-c 10 aspmx.l.google.com 25");
-        writeLine();
-    })
-    .parse(process.argv);
+var usage = [
+    "",
+    "    Usage: tcpie [options] host[:port] [port|80]",
+    "",
+    "    Options:",
+    "",
+    "      -v, --version       output version",
+    "      -c, --count <n>     number of connects (default: infinite)",
+    "      -i, --interval <n>  wait n seconds between connects (default: 1)",
+    "      -t, --timeout <n>   connection timeout in seconds (default: 3)",
+    "      -T, --timestamp     add timestamps to output",
+    "      -f, --flood         flood mode, connect as fast as possible",
+    "      -C, --no-color      disable color output",
+    "",
+    "    Examples:",
+    "",
+    "      $ tcpie www.google.com",
+    "      $ tcpie -i .1 8.8.8.8:53",
+    "      $ tcpie -c 10 -t .05 aspmx.l.google.com 25",
+    "",
+    ""].join("\n");
 
-if (!cmd.args.length || cmd.args.length > 2 || (cmd.args[1] && isNaN(parseInt(cmd.args[1], 10)))) {
-    cmd.outputHelp();
-    process.exit(1);
+if (args.v) {
+    return process.stdout.write(pkg.version + "\n");
 }
 
-var host    = cmd.args[0],
+if (!args._.length || args._.length > 2 || (args._[1] && isNaN(parseInt(args._[1], 10)))) {
+    help();
+}
+
+var host    = args._[0],
     opts    = {},
-    port    = parseInt(cmd.args[1], 10),
+    port    = parseInt(args._[1], 10),
     printed = false,
     rtts    = [],
     stats;
 
+if (typeof host !== "string") {
+    help();
+}
+
 // host:port syntax
-var matches = host.match(/^(.+):(.+)$/);
+var matches = /^(.+):(\d+)$/.exec(host);
 if (matches && matches.length === 3 && !port) {
     host = matches[1];
     port = matches[2];
 }
 
 if (!port) port = DEFAULT_PORT;
-if (cmd.count) opts.count = parseInt(cmd.count, 10);
-if (cmd.interval) opts.interval = secondsToMs(cmd.interval);
-if (cmd.timeout) opts.timeout = secondsToMs(cmd.timeout);
-if (cmd.flood) opts.interval = 0;
-if (!cmd.color) chalk.enabled = false;
+if (args.count || args.c) opts.count = parseInt(args.count || args.c, 10);
+if (args.interval || args.i) opts.interval = secondsToMs(args.interval || args.i);
+if (args.timeout || args.t) opts.timeout = secondsToMs(args.timeout || args.t);
+if (args.flood || args.f) opts.interval = 0;
+if (args.C || args.color === false) chalk.enabled = false;
 
 // Do a DNS lookup and start the connects
 if (!net.isIP(host)) {
@@ -170,15 +174,19 @@ function colorRTT(rtt) {
 }
 
 function writeLine() {
-    var args = [].slice.call(arguments), stream;
-    args = args.filter(function (string) { return Boolean(string); });
-    if (cmd.timestamp && args[0][0] !== "\n") args.unshift(timestamp());
-    args.push("\n");
+    var arg = [].slice.call(arguments), stream;
+    arg = arg.filter(function (string) { return Boolean(string); });
+    if ((args.timeout || args.t) && arg[0][0] !== "\n") arg.unshift(timestamp());
+    arg.push("\n");
     stream = (process.stdout._type === "pipe" && printed) ? process.stderr : process.stdout;
-    stream.write(args.join(" "));
+    stream.write(arg.join(" "));
 }
 
-// convert seconds to milliseconds
+function help() {
+    process.stdout.write(usage);
+    process.exit(1);
+}
+
 function secondsToMs(s) {
     return (parseFloat(s) * 1000);
 }

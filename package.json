@@ -21,10 +21,10 @@
   ],
   "dependencies": {
     "chalk": "^1.0.0",
-    "commander": "^2.8.1",
     "compute-stdev": "^1.0.0",
     "defaults": "^1.0.2",
-    "epipebomb": "^0.1.1"
+    "epipebomb": "^0.1.1",
+    "minimist": "^1.1.1"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
