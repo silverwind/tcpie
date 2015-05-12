@@ -23,7 +23,7 @@ rtt min/avg/max/stdev = 25.757/28.835/31.908/2.184 ms
 ```
 ## Usage
 ```
-Usage: tcpie [options] host[:port] [port|80]
+Usage: tcpie [options] host[:port]|url [port|80]
 
 Options:
 
@@ -34,6 +34,14 @@ Options:
   -T, --timestamp     add timestamps to output
   -f, --flood         flood mode, connect as fast as possible
   -C, --no-color      disable color output
+
+Examples:
+
+  $ tcpie google.com
+  $ tcpie -i .1 8.8.8.8:53
+  $ tcpie -c5 -t.05 aspmx.l.google.com 25
+  $ tcpie -i.2 https://google.com
+
 ```
 
 ## Module API

@@ -24,7 +24,7 @@ var DIGITS_LINE  = 1,
 
 var usage = [
     "",
-    "    Usage: tcpie [options] host[:port] [port|80]",
+    "    Usage: tcpie [options] host[:port]|url [port|80]",
     "",
     "    Options:",
     "",
@@ -38,9 +38,10 @@ var usage = [
     "",
     "    Examples:",
     "",
-    "      $ tcpie www.google.com",
+    "      $ tcpie google.com",
     "      $ tcpie -i .1 8.8.8.8:53",
     "      $ tcpie -c5 -t.05 aspmx.l.google.com 25",
+    "      $ tcpie -i.2 https://google.com",
     "",
     ""].join("\n");
 
@@ -69,6 +70,22 @@ if (matches && matches.length === 3 && !port) {
     host = matches[1];
     port = matches[2];
 }
+
+// url syntax
+if (/.+:\/\/.+/.exec(host)) {
+    var url = require("url").parse(host);
+    var proto = url.protocol.replace(":", "");
+    host = url.host;
+    port = url.port || require("port-numbers").getPort(proto).port;
+    if (!port) {
+        writeLine(chalk.red("ERROR:"), "Unknown protocol '" + proto + "'");
+        process.exit(1);
+    }
+    if (!host) {
+        writeLine(chalk.red("ERROR:"), "Missing host in '" + host + "'");
+    }
+}
+
 
 if (!port) port = DEFAULT_PORT;
 if (args.count || args.c) opts.count = parseInt(args.count || args.c, 10);
