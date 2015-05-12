@@ -128,11 +128,27 @@ function run(host, port, opts) {
         );
     });
 
+    if (process.stdin.isTTY) {
+        process.stdin.setRawMode(true);
+        process.stdin.on("data", function (bytes) {
+            // http://nemesis.lonestar.org/reference/telecom/codes/ascii.html
+            if (
+                bytes[0] === 3  || // SIGINT
+                bytes[0] === 4  || // EOF
+                bytes[0] === 26 || // SIGTSTP
+                bytes[0] === 28    // SIGQUIT
+                ) {
+                process.exit();
+            }
+        });
+    } else {
+        process.on("SIGINT", process.exit);
+        process.on("SIGQUIT", process.exit);
+        process.on("SIGTERM", process.exit);
+        process.on("SIGTSTP", process.exit);
+    }
+
     process.on("exit", printEnd);
-    process.stdin.setRawMode(true);
-    process.stdin.on("data", function (bytes) {
-        if (bytes[0] === 3 || bytes[0] === 4) process.exit();
-    });
     pie.on("end", printEnd).start();
 }
 
