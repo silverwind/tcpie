@@ -46,7 +46,8 @@ var usage = [
     ""].join("\n");
 
 if (args.v) {
-    return process.stdout.write(pkg.version + "\n");
+    process.stdout.write(pkg.version + "\n");
+    process.exit(0);
 }
 
 if (!args._.length || args._.length > 2 || (args._[1] && isNaN(parseInt(args._[1], 10)))) {
@@ -72,7 +73,7 @@ if (matches && matches.length === 3 && !port) {
 }
 
 // url syntax
-if (/.+:\/\/.+/.exec(host)) {
+if (/.+:\/\/.+/.test(host)) {
     var url = require("url").parse(host);
     var proto = url.protocol.replace(":", "");
     host = url.host;
