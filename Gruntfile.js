@@ -32,24 +32,18 @@ module.exports = function (grunt) {
             modules: {
                 command: "rm -rf node_modules && npm install"
             },
-        },
-        jshint: {
-            options: {
-                jshintrc: true
-            },
-            all: [
-                "*.js",
-            ]
+            lint: {
+                command: "eslint --reset --color --quiet *.js"
+            }
         }
     });
 
     grunt.registerTask("update", ["shell:update", "shell:modules"]);
-    grunt.registerTask("patch",  ["jshint", "bump", "shell:push", "shell:publish"]);
-    grunt.registerTask("minor",  ["jshint", "bump:minor", "shell:push", "shell:publish"]);
-    grunt.registerTask("major",  ["jshint", "bump:major", "shell:push", "shell:publish"]);
-    grunt.registerTask("jshint", ["jshint"]);
+    grunt.registerTask("patch",  ["shell:lint", "bump", "shell:push", "shell:publish"]);
+    grunt.registerTask("minor",  ["shell:lint", "bump:minor", "shell:push", "shell:publish"]);
+    grunt.registerTask("major",  ["shell:lint", "bump:major", "shell:push", "shell:publish"]);
+    grunt.registerTask("lint",   ["shell:lint"]);
 
     grunt.loadNpmTasks("grunt-bump");
     grunt.loadNpmTasks("grunt-shell");
-    grunt.loadNpmTasks("grunt-contrib-jshint");
 };
