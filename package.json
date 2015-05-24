@@ -4,8 +4,6 @@
   "description": "ping-like tool to test a TCP connection",
   "author": "silverwind <me@silverwind.io> (https://github.com/silverwind)",
   "repository": "silverwind/tcpie",
-  "homepage": "https://github.com/silverwind/tcpie",
-  "bugs": "https://github.com/silverwind/tcpie/issues",
   "license": "BSD-2-clause",
   "bin": "tcpie.js",
   "keywords": [
@@ -18,6 +16,10 @@
     "connection",
     "test",
     "testing"
+  ],
+  "files": [
+    "index.js",
+    "tcpie.js"
   ],
   "dependencies": {
     "chalk": "^1.0.0",
