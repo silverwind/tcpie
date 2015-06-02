@@ -4,7 +4,7 @@
   "description": "ping-like tool to test a TCP connection",
   "author": "silverwind <me@silverwind.io> (https://github.com/silverwind)",
   "repository": "silverwind/tcpie",
-  "license": "BSD-2-clause",
+  "license": "BSD-2-Clause",
   "bin": "tcpie.js",
   "keywords": [
     "tcp",
