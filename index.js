@@ -19,7 +19,7 @@ var Tcpie = function (host, port, opts) {
         interval: 1000,
         timeout : 3000,
         count   : Infinity
-    }, this.opts);
+    }, opts);
 
     this.stats = {
         sent   : 0,
