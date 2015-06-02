@@ -1,6 +1,6 @@
 "use strict";
 
-var defaults = require("defaults"),
+var extend   = require("util-extend"),
     events   = require("events"),
     net      = require("net"),
     util     = require("util");
@@ -14,11 +14,13 @@ var Tcpie = function (host, port, opts) {
 
     this.host = host;
     this.port = port;
-    this.opts = defaults(opts, {
+
+    this.opts = extend({
         interval: 1000,
         timeout : 3000,
         count   : Infinity
-    });
+    }, this.opts);
+
     this.stats = {
         sent   : 0,
         success: 0,

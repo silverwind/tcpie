@@ -24,10 +24,10 @@
   "dependencies": {
     "chalk": "^1.0.0",
     "compute-stdev": "^1.0.0",
-    "defaults": "^1.0.2",
     "epipebomb": "^0.1.1",
     "minimist": "^1.1.1",
-    "port-numbers": "^1.1.10"
+    "port-numbers": "^1.1.10",
+    "util-extend": "^1.0.1"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
