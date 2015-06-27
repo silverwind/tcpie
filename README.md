@@ -56,7 +56,7 @@ var pie = tcpie('google.com', 80, {count: 10, interval: 500, timeout: 2000});
 
 pie.on('connect', function(data) {
   console.info('connect', data);
-}).on('error', function(data, err) {
+}).on('error', function(err, data) {
   console.error(err, data);
 }).on('timeout', function(data) {
   console.info('timeout', data);

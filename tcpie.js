@@ -117,7 +117,7 @@ if (!net.isIP(host)) {
 function run(host, port, opts) {
     var pie = tcpie(host, port, opts);
 
-    pie.on("error", function (data, err) {
+    pie.on("error", function (err, data) {
         stats = data;
         writeLine(
             chalk.red("error connecting to", data.target.host + ":" + data.target.port),

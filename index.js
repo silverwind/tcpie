@@ -58,7 +58,7 @@ Tcpie.prototype.start = function start() {
             done = true;
             self.stats.sent++;
             self.stats.failed++;
-            self.emit("error", addDetails(self, this), err);
+            self.emit("error", err, addDetails(self, this));
             socket.destroy();
             checkEnd(self);
         }
