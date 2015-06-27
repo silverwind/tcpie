@@ -54,12 +54,12 @@ $ npm install --save tcpie
 var tcpie = require('tcpie');
 var pie = tcpie('google.com', 80, {count: 10, interval: 500, timeout: 2000});
 
-pie.on('connect', function(data) {
-  console.info('connect', data);
-}).on('error', function(err, data) {
-  console.error(err, data);
-}).on('timeout', function(data) {
-  console.info('timeout', data);
+pie.on('connect', function(stats) {
+  console.info('connect', stats);
+}).on('error', function(err, stats) {
+  console.error(err, stats);
+}).on('timeout', function(stats) {
+  console.info('timeout', stats);
 }).on('end', function(stats) {
   console.info(stats);
   // -> {
@@ -81,23 +81,19 @@ pie.on('connect', function(data) {
 - `timeout`  *number* : the connection timeout in milliseconds (default: 3000).
 
 #### Events
-- `connect` : Arguments: `data`. Connection attempt succeeded.
-- `timeout` : Arguments: `data`. Connection attempt ran into the timeout.
-- `error`   : Arguments: `data`, `err`. Connection attempt failed.
+- `connect` : Arguments: `stats`. Connection attempt succeeded.
+- `timeout` : Arguments: `stats`. Connection attempt ran into the timeout.
+- `error`   : Arguments: `err`, `stats`. Connection attempt failed.
 - `end`     : Arguments: `stats`. All connection attempts have finished.
-
-#### *data* argument properties
-- `sent`    *number* : number of total attempts made.
-- `success` *number* : number of successfull attempts.
-- `failed`  *number* : number of failed attempts.
-- `rtt`     *number* : roundtrip time in milliseconds. *undefined* if failed.
-- `target`  *object* : target details: `host` and `port`.
-- `socket`  *object* : socket details: `localAddress`, `localPort`, `remoteAddress`, `remotePort`.
 
 #### *stats* argument properties
 - `sent`    *number* : number of total attempts made.
 - `success` *number* : number of successfull attempts.
 - `failed`  *number* : number of failed attempts.
 - `target`  *object* : target details: `host` and `port`.
+
+The following properties are present on all events except `end`:
+- `rtt`     *number* : roundtrip time in milliseconds. *undefined* if failed.
+- `socket`  *object* : socket details: `localAddress`, `localPort`, `remoteAddress`, `remotePort`.
 
 © 2015 [silverwind](https://github.com/silverwind), distributed under BSD licence
