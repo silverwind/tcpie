@@ -1,6 +1,6 @@
 {
   "name": "tcpie",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "ping-like tool to test a TCP connection",
   "author": "silverwind <me@silverwind.io> (https://github.com/silverwind)",
   "repository": "silverwind/tcpie",
