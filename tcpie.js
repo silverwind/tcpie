@@ -201,8 +201,11 @@ function printEnd() {
           "\n" + stats.sent, "handshakes attempted,", stats.success || "0", "succeeded,",
           ((stats.failed / stats.sent) * 100).toFixed(DIGITS_PERC) + "% failed",
           "\nrtt min/avg/max/stdev =", min + "/" + avg + "/" + max + "/" + dev, "ms");
+
+    process.exit(stats.success && 1 || 0);
+  } else {
+    process.exit(1);
   }
-  process.exit(0);
 }
 
 function colorRTT(rtt) {
