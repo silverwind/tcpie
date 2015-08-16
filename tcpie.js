@@ -150,13 +150,15 @@ function run(host, port, opts) {
     process.stdin.setRawMode(true);
     process.stdin.on("data", function (bytes) {
       // http://nemesis.lonestar.org/reference/telecom/codes/ascii.html
-      if (
-        bytes[0] === 3  || // SIGINT
-        bytes[0] === 4  || // EOF
-        bytes[0] === 26 || // SIGTSTP
-        bytes[0] === 28    // SIGQUIT
-        ) {
-        process.exit();
+      var exitCodes = [
+        3,  // SIGINT
+        4,  // EOF
+        26, // SIGTSTP
+        28, // SIGQUIT
+      ];
+      for (var i = 0; i < bytes.length; i++) {
+        if (exitCodes.indexOf(bytes[i]) !== -1)
+          process.exit(0);
       }
     });
   } else {
