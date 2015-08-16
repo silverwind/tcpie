@@ -215,7 +215,7 @@ function colorRTT(rtt) {
 function writeLine() {
   var arg = [].slice.call(arguments), stream;
   arg = arg.filter(function (string) { return Boolean(string); });
-  if ((args.timeout || args.t) && arg[0][0] !== "\n") arg.unshift(timestamp());
+  if ((args.timeout || args.T) && arg[0][0] !== "\n") arg.unshift(timestamp());
   arg.push("\n");
   stream = (process.stdout._type === "pipe" && printed) ? process.stderr : process.stdout;
   stream.write(arg.join(" "));
