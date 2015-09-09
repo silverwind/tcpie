@@ -9,7 +9,7 @@ process.title = pkg.name;
 // avoid EPIPE on partially consumed streams
 require("epipebomb")();
 
-var args   = require("minimist")(process.argv.slice(2));
+var args   = require("minimist")(process.argv.slice(2), {boolean: ["color", "C"]});
 var chalk  = require("chalk");
 var net    = require("net");
 var dns    = require("dns");
@@ -86,7 +86,6 @@ if (/.+:\/\/.+/.test(host)) {
     writeLine(chalk.red("ERROR:"), "Missing host in '" + host + "'");
   }
 }
-
 
 if (!port) port = DEFAULT_PORT;
 if (args.count || args.c) opts.count = parseInt(args.count || args.c, 10);
