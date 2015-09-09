@@ -9,7 +9,7 @@ process.title = pkg.name;
 // avoid EPIPE on partially consumed streams
 require("epipebomb")();
 
-var args   = require("minimist")(process.argv.slice(2), {boolean: ["color", "C"]});
+var args   = require("minimist")(process.argv.slice(2), {boolean: ["color"]});
 var chalk  = require("chalk");
 var net    = require("net");
 var dns    = require("dns");
@@ -92,7 +92,7 @@ if (args.count || args.c) opts.count = parseInt(args.count || args.c, 10);
 if (args.interval || args.i) opts.interval = secondsToMs(args.interval || args.i);
 if (args.timeout || args.t) opts.timeout = secondsToMs(args.timeout || args.t);
 if (args.flood || args.f) opts.interval = 0;
-if (args.C || args.color === false) chalk.enabled = false;
+if (args.C) chalk.enabled = false;
 
 // Do a DNS lookup and start the connects
 if (!net.isIP(host)) {
