@@ -123,9 +123,7 @@ function run(host, port, opts) {
       "seq=" + data.sent,
       "error=" + chalk.red(err.code)
     );
-  });
-
-  pie.on("connect", function(data) {
+  }).on("connect", function(data) {
     stats = data;
     rtts.push(data.rtt);
     writeLine(
@@ -134,9 +132,7 @@ function run(host, port, opts) {
       "srcport=" + data.socket.localPort,
       "time=" + colorRTT(data.rtt.toFixed(DIGITS_LINE))
     );
-  });
-
-  pie.on("timeout", function(data) {
+  }).on("timeout", function(data) {
     stats = data;
     writeLine(
       chalk.red("timeout connecting to", data.target.host + ":" + data.target.port),
