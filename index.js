@@ -5,7 +5,7 @@ var events = require("events");
 var net    = require("net");
 var util   = require("util");
 
-var Tcpie = function (host, port, opts) {
+var Tcpie = function(host, port, opts) {
   if (typeof host !== "string")
     throw new Error("host is required");
 
@@ -42,7 +42,7 @@ Tcpie.prototype.start = function start() {
   var done      = false;
 
   socket.setTimeout(self.opts.timeout);
-  socket.on("timeout", function () {
+  socket.on("timeout", function() {
     if (!done) {
       done = true;
       self.stats.sent++;
@@ -53,7 +53,7 @@ Tcpie.prototype.start = function start() {
     }
   });
 
-  socket.on("error", function (err) {
+  socket.on("error", function(err) {
     if (!done) {
       done = true;
       self.stats.sent++;
@@ -64,7 +64,7 @@ Tcpie.prototype.start = function start() {
     }
   });
 
-  socket.connect(self.port, self.host, function () {
+  socket.connect(self.port, self.host, function() {
     if (!done) {
       done = true;
       self.stats.sent++;
@@ -79,7 +79,7 @@ Tcpie.prototype.start = function start() {
   return self;
 };
 
-module.exports = function (host, port, opts) {
+module.exports = function(host, port, opts) {
   return new Tcpie(host, port, opts);
 };
 

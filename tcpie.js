@@ -96,7 +96,7 @@ if (args.C) chalk.enabled = false;
 
 // Do a DNS lookup and start the connects
 if (!net.isIP(host)) {
-  dns.lookup(host, function (err, address) {
+  dns.lookup(host, function(err, address) {
     if (!err) {
       printStart(host, address, port);
       run(host, port, opts);
@@ -116,7 +116,7 @@ if (!net.isIP(host)) {
 function run(host, port, opts) {
   var pie = tcpie(host, port, opts);
 
-  pie.on("error", function (err, data) {
+  pie.on("error", function(err, data) {
     stats = data;
     writeLine(
       chalk.red("error connecting to", data.target.host + ":" + data.target.port),
@@ -125,7 +125,7 @@ function run(host, port, opts) {
     );
   });
 
-  pie.on("connect", function (data) {
+  pie.on("connect", function(data) {
     stats = data;
     rtts.push(data.rtt);
     writeLine(
@@ -136,7 +136,7 @@ function run(host, port, opts) {
     );
   });
 
-  pie.on("timeout", function (data) {
+  pie.on("timeout", function(data) {
     stats = data;
     writeLine(
       chalk.red("timeout connecting to", data.target.host + ":" + data.target.port),
@@ -147,7 +147,7 @@ function run(host, port, opts) {
 
   if (process.stdin.isTTY) {
     process.stdin.setRawMode(true);
-    process.stdin.on("data", function (bytes) {
+    process.stdin.on("data", function(bytes) {
       // http://nemesis.lonestar.org/reference/telecom/codes/ascii.html
       var exitCodes = [
         3,  // SIGINT
@@ -182,7 +182,7 @@ function printEnd() {
     process.exit(0);
 
   if (stats && stats.sent > 0) {
-    rtts.forEach(function (rtt) {
+    rtts.forEach(function(rtt) {
       if (rtt <= min) min = rtt.toFixed(DIGITS_STATS);
       if (rtt >= max) max = rtt.toFixed(DIGITS_STATS);
       sum += rtt;
@@ -213,7 +213,7 @@ function colorRTT(rtt) {
 
 function writeLine() {
   var arg = [].slice.call(arguments), stream;
-  arg = arg.filter(function (string) { return Boolean(string); });
+  arg = arg.filter(function(string) { return Boolean(string); });
   if ((args.timeout || args.T) && arg[0][0] !== "\n") arg.unshift(timestamp());
   arg.push("\n");
   stream = (process.stdout._type === "pipe" && printed) ? process.stderr : process.stdout;
