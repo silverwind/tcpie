@@ -50,13 +50,13 @@ if (args.v) {
   process.exit(0);
 }
 
-if (!args._.length || args._.length > 2 || (args._[1] && isNaN(parseInt(args._[1], 10)))) {
+if (!args._.length || args._.length > 2 || (args._[1] && isNaN(parseInt(args._[1])))) {
   help();
 }
 
 var host    = args._[0];
 var opts    = {};
-var port    = parseInt(args._[1], 10);
+var port    = parseInt(args._[1]);
 var printed = false;
 var rtts    = [];
 var stats;
@@ -88,7 +88,7 @@ if (/.+:\/\/.+/.test(host)) {
 }
 
 if (!port) port = DEFAULT_PORT;
-if (args.count || args.c) opts.count = parseInt(args.count || args.c, 10);
+if (args.count || args.c) opts.count = parseInt(args.count || args.c);
 if (args.interval || args.i) opts.interval = secondsToMs(args.interval || args.i);
 if (args.timeout || args.t) opts.timeout = secondsToMs(args.timeout || args.t);
 if (args.flood || args.f) opts.interval = 0;
