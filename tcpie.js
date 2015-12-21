@@ -9,7 +9,14 @@ process.title = pkg.name;
 // avoid EPIPE on partially consumed streams
 require("epipebomb")();
 
-var args   = require("minimist")(process.argv.slice(2), {boolean: ["color"]});
+var args   = require("minimist")(process.argv.slice(2), {
+  boolean: [
+    "color", "C",
+    "timestamp", "T",
+    "flood", "f",
+    "version", "v"
+  ]
+});
 var chalk  = require("chalk");
 var net    = require("net");
 var dns    = require("dns");
