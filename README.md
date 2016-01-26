@@ -10,16 +10,16 @@ $ [sudo] npm install -g tcpie
 ### Example
 ```
 $ tcpie -c 5 google.com
-TCPIE google.com (188.21.9.116) port 80
-connected to google.com:80 seq=1 srcport=3238 time=25.8 ms
-connected to google.com:80 seq=2 srcport=3239 time=31.9 ms
-connected to google.com:80 seq=3 srcport=3240 time=29.1 ms
-connected to google.com:80 seq=4 srcport=3241 time=28.9 ms
-connected to google.com:80 seq=5 srcport=3242 time=28.5 ms
+TCPIE google.com (188.21.9.120) port 80
+connected to google.com:80 seq=1 srcport=59053 time=12.9 ms
+connected to google.com:80 seq=2 srcport=59054 time=10.0 ms
+connected to google.com:80 seq=3 srcport=59055 time=10.1 ms
+connected to google.com:80 seq=4 srcport=59056 time=11.4 ms
+connected to google.com:80 seq=5 srcport=59057 time=10.4 ms
 
 --- google.com tcpie statistics ---
 5 handshakes attempted, 5 succeeded, 0% failed
-rtt min/avg/max/stdev = 25.757/28.835/31.908/2.184 ms
+rtt min/avg/max/stdev = 10.012/10.970/12.854/1.190 ms
 ```
 ## Usage
 ```
