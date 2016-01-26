@@ -27,7 +27,7 @@
     "compute-stdev": "^1.0.0",
     "epipebomb": "^0.1.1",
     "minimist": "^1.2.0",
-    "port-numbers": "^1.1.27",
-    "util-extend": "^1.0.1"
+    "port-numbers": "^1.1.29",
+    "util-extend": "^1.0.3"
   }
 }
