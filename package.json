@@ -1,7 +1,7 @@
 {
   "name": "tcpie",
   "version": "3.0.4",
-  "description": "ping-like tool to test a TCP connection",
+  "description": "Ping any TCP port",
   "author": "silverwind <me@silverwind.io> (https://github.com/silverwind)",
   "repository": "silverwind/tcpie",
   "license": "BSD-2-Clause",
