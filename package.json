@@ -23,11 +23,11 @@
     "tcpie.js"
   ],
   "dependencies": {
-    "chalk": "^1.1.1",
+    "chalk": "^1.1.3",
     "compute-stdev": "^1.0.0",
     "epipebomb": "^0.1.1",
     "minimist": "^1.2.0",
-    "port-numbers": "^1.1.29",
+    "port-numbers": "^1.1.40",
     "util-extend": "^1.0.3"
   }
 }
