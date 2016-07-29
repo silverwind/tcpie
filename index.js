@@ -6,6 +6,9 @@ var net    = require("net");
 var util   = require("util");
 
 var Tcpie = function(host, port, opts) {
+  if (!(this instanceof Tcpie))
+    return new Tcpie();
+
   if (typeof host !== "string")
     throw new Error("host is required");
 
