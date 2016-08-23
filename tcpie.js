@@ -182,7 +182,7 @@ function printEnd() {
   var sum = 0, min = Infinity, max = 0, avg, dev;
 
   if (printed)
-    process.exit(0);
+    process.exit(stats.success === 0 && 1 || 0);
 
   if (stats && stats.sent > 0) {
     rtts.forEach(function(rtt) {
@@ -204,7 +204,7 @@ function printEnd() {
           ((stats.failed / stats.sent) * 100).toFixed(DIGITS_PERC) + "% failed",
           "\nrtt min/avg/max/stdev =", min + "/" + avg + "/" + max + "/" + dev, "ms");
 
-    process.exit(stats.success && 1 || 0);
+    process.exit(stats.success === 0 && 1 || 0);
   } else {
     process.exit(1);
   }
