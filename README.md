@@ -97,4 +97,4 @@ The following properties are present on all events except `end`:
 - `rtt`     *number* : roundtrip time in milliseconds. *undefined* if failed.
 - `socket`  *object* : socket details: `localAddress`, `localPort`, `remoteAddress`, `remotePort`.
 
-© 2015 [silverwind](https://github.com/silverwind), distributed under BSD licence
+© [silverwind](https://github.com/silverwind), distributed under BSD licence
