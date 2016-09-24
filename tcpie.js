@@ -157,7 +157,7 @@ function run(host, port, opts) {
       ];
       for (var i = 0; i < bytes.length; i++) {
         if (exitCodes.indexOf(bytes[i]) !== -1)
-          process.exit(0);
+          printEnd();
       }
     });
   } else {
