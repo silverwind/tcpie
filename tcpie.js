@@ -3,9 +3,6 @@
 
 var pkg = require("./package.json");
 
-// set process title
-process.title = pkg.name;
-
 // avoid EPIPE on partially consumed streams
 require("epipebomb")();
 
