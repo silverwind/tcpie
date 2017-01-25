@@ -1,6 +1,9 @@
 lint:
 	eslint --color --quiet *.js
 
+test:
+	node test.js
+
 publish:
 	git push -u --tags origin master
 	npm publish
@@ -19,8 +22,8 @@ npm-minor:
 npm-major:
 	npm version major
 
-patch: lint npm-patch publish
-minor: lint npm-minor publish
-major: lint npm-major publish
+patch: lint test npm-patch publish
+minor: lint test npm-minor publish
+major: lint test npm-major publish
 
 .PHONY: lint touch update patch minor major npm-patch npm-minor npm-major

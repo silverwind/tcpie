@@ -6,6 +6,9 @@
   "repository": "silverwind/tcpie",
   "license": "BSD-2-Clause",
   "bin": "tcpie.js",
+  "scripts": {
+    "test": "node test.js"
+  },
   "keywords": [
     "tcp",
     "port",
