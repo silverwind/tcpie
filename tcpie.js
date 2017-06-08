@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 "use strict";
 
-var pkg = require("./package.json");
+const pkg = require("./package.json");
 
 // avoid EPIPE on partially consumed streams
 require("epipebomb")();
 
-var args   = require("minimist")(process.argv.slice(2), {
+const args   = require("minimist")(process.argv.slice(2), {
   boolean: [
     "color", "C",
     "timestamp", "T",
@@ -14,18 +14,18 @@ var args   = require("minimist")(process.argv.slice(2), {
     "version", "v"
   ]
 });
-var chalk  = require("chalk");
-var net    = require("net");
-var dns    = require("dns");
-var stdev  = require("compute-stdev");
-var tcpie  = require("./");
+const chalk  = require("chalk");
+const net    = require("net");
+const dns    = require("dns");
+const stdev  = require("compute-stdev");
+const tcpie  = require("./");
 
-var DIGITS_LINE  = 1;
-var DIGITS_STATS = 3;
-var DIGITS_PERC  = 0;
-var DEFAULT_PORT = 80;
+const DIGITS_LINE  = 1;
+const DIGITS_STATS = 3;
+const DIGITS_PERC  = 0;
+const DEFAULT_PORT = 80;
 
-var usage = [
+const usage = [
   "",
   "    Usage: tcpie [options] host[:port]|url [port|80]",
   "",
@@ -58,19 +58,19 @@ if (!args._.length || args._.length > 2 || (args._[1] && isNaN(parseInt(args._[1
   help();
 }
 
-var host    = args._[0];
-var opts    = {};
-var port    = parseInt(args._[1]);
-var printed = false;
-var rtts    = [];
-var stats;
+let host    = args._[0];
+const opts    = {};
+let port    = parseInt(args._[1]);
+let printed = false;
+const rtts    = [];
+let stats;
 
 if (typeof host !== "string") {
   help();
 }
 
 // host:port syntax
-var matches = /^(.+):(\d+)$/.exec(host);
+const matches = /^(.+):(\d+)$/.exec(host);
 if (matches && matches.length === 3 && !port) {
   host = matches[1];
   port = matches[2];
@@ -78,8 +78,8 @@ if (matches && matches.length === 3 && !port) {
 
 // url syntax
 if (/.+:\/\/.+/.test(host)) {
-  var url = require("url").parse(host);
-  var proto = url.protocol.replace(":", "");
+  const url = require("url").parse(host);
+  const proto = url.protocol.replace(":", "");
   host = url.host;
   port = url.port || require("port-numbers").getPort(proto).port;
   if (!port) {
@@ -118,7 +118,7 @@ if (!net.isIP(host)) {
 }
 
 function run(host, port, opts) {
-  var pie = tcpie(host, port, opts);
+  const pie = tcpie(host, port, opts);
 
   pie.on("error", function(err, data) {
     stats = data;
@@ -149,13 +149,13 @@ function run(host, port, opts) {
     process.stdin.setRawMode(true);
     process.stdin.on("data", function(bytes) {
       // http://nemesis.lonestar.org/reference/telecom/codes/ascii.html
-      var exitCodes = [
+      const exitCodes = [
         3,  // SIGINT
         4,  // EOF
         26, // SIGTSTP
         28, // SIGQUIT
       ];
-      for (var i = 0; i < bytes.length; i++) {
+      for (let i = 0; i < bytes.length; i++) {
         if (exitCodes.indexOf(bytes[i]) !== -1)
           printEnd();
       }
@@ -176,7 +176,7 @@ function printStart(host, address, port) {
 }
 
 function printEnd() {
-  var sum = 0, min = Infinity, max = 0, avg, dev;
+  let sum = 0, min = Infinity, max = 0, avg, dev;
 
   if (printed)
     process.exit(stats.success === 0 && 1 || 0);
@@ -212,11 +212,11 @@ function colorRTT(rtt) {
 }
 
 function writeLine() {
-  var arg = [].slice.call(arguments), stream;
+  let arg = [].slice.call(arguments);
   arg = arg.filter(function(string) { return Boolean(string); });
   if ((args.timeout || args.T) && arg[0][0] !== "\n") arg.unshift(timestamp());
   arg.push("\n");
-  stream = (process.stdout._type === "pipe" && printed) ? process.stderr : process.stdout;
+  const stream = (process.stdout._type === "pipe" && printed) ? process.stderr : process.stdout;
   stream.write(arg.join(" "));
 }
 
@@ -230,9 +230,13 @@ function secondsToMs(s) {
 }
 
 function timestamp() {
-  var now = new Date(), day = now.getDate(), month = now.getMonth() + 1;
-  var year = now.getFullYear(), hrs = now.getHours(), mins = now.getMinutes();
-  var secs = now.getSeconds();
+  const now = new Date();
+  const year = now.getFullYear();
+  let month = now.getMonth() + 1;
+  let day = now.getDate();
+  let hrs = now.getHours();
+  let mins = now.getMinutes();
+  let secs = now.getSeconds();
 
   if (month < 10) month = "0" + month;
   if (day   < 10) day   = "0" + day;

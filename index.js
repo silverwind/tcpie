@@ -1,11 +1,11 @@
 "use strict";
 
-var extend = require("util-extend");
-var events = require("events");
-var net    = require("net");
-var util   = require("util");
+const extend = require("util-extend");
+const events = require("events");
+const net    = require("net");
+const util   = require("util");
 
-var Tcpie = function(host, port, opts) {
+const Tcpie = function(host, port, opts) {
   if (!(this instanceof Tcpie))
     return new Tcpie();
 
@@ -34,15 +34,15 @@ var Tcpie = function(host, port, opts) {
 util.inherits(Tcpie, events.EventEmitter);
 
 Tcpie.prototype.start = function start() {
-  var self = this;
+  const self = this;
 
   if (self.stats.sent >= self.opts.count) return;
 
   self._next = setTimeout(start.bind(self), self.opts.interval);
 
-  var socket    = new net.Socket();
-  var startTime = now();
-  var done      = false;
+  const socket    = new net.Socket();
+  const startTime = now();
+  let done      = false;
 
   socket.setTimeout(self.opts.timeout);
   socket.on("timeout", function() {
@@ -88,7 +88,7 @@ module.exports = function(host, port, opts) {
 
 // add details to stats object
 function addDetails(self, socket) {
-  var ret = self.stats;
+  const ret = self.stats;
 
   ret.target = {
     host: self.host,
@@ -125,6 +125,6 @@ function checkEnd(self) {
 
 // get current timestamp in nanoseconds
 function now() {
-  var hrtime = process.hrtime();
+  const hrtime = process.hrtime();
   return hrtime[0] * 1e9 + hrtime[1];
 }

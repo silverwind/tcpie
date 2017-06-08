@@ -9,6 +9,9 @@
   "scripts": {
     "test": "node test.js"
   },
+  "engines": {
+    "node": ">=4"
+  },
   "keywords": [
     "tcp",
     "port",
