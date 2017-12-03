@@ -6,14 +6,11 @@ const net    = require("net");
 const util   = require("util");
 
 const Tcpie = function(host, port, opts) {
-  if (!(this instanceof Tcpie))
-    return new Tcpie();
+  if (!(this instanceof Tcpie)) return new Tcpie();
 
-  if (typeof host !== "string")
-    throw new Error("host is required");
+  if (typeof host !== "string") throw new Error("host is required");
 
-  if (typeof port === "undefined")
-    port = 80;
+  if (typeof port === "undefined") port = 80;
 
   this.host = host;
   this.port = port;
@@ -108,8 +105,7 @@ function addDetails(self, socket) {
 // check end condition
 function checkEnd(self) {
   if ((self.stats.failed + self.stats.success) >= self.opts.count) {
-    if (self._next)
-      clearTimeout(self._next);
+    if (self._next) clearTimeout(self._next);
 
     self.emit("end", {
       sent   : self.stats.sent,

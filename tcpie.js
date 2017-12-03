@@ -105,10 +105,8 @@ if (!net.isIP(host)) {
       printStart(host, address, port);
       run(host, port, opts);
     } else {
-      if (err.code === "ENOTFOUND")
-        writeLine(chalk.red("ERROR:"), "Host '" + host + "' not found");
-      else
-        writeLine(chalk.red("ERROR:"), err.code, err.syscall || "");
+      if (err.code === "ENOTFOUND") writeLine(chalk.red("ERROR:"), "Host '" + host + "' not found");
+      else writeLine(chalk.red("ERROR:"), err.code, err.syscall || "");
       process.exit(1);
     }
   });
@@ -156,8 +154,7 @@ function run(host, port, opts) {
         28, // SIGQUIT
       ];
       for (let i = 0; i < bytes.length; i++) {
-        if (exitCodes.indexOf(bytes[i]) !== -1)
-          printEnd();
+        if (exitCodes.indexOf(bytes[i]) !== -1) printEnd();
       }
     });
   } else {
@@ -178,8 +175,7 @@ function printStart(host, address, port) {
 function printEnd() {
   let sum = 0, min = Infinity, max = 0, avg, dev;
 
-  if (printed)
-    process.exit(stats.success === 0 && 1 || 0);
+  if (printed) process.exit(stats.success === 0 && 1 || 0);
 
   if (stats && stats.sent > 0) {
     rtts.forEach(function(rtt) {
@@ -196,10 +192,12 @@ function printEnd() {
 
     printed = true;
 
-    writeLine("\n---", host, pkg.name + " statistics", "---",
-          "\n" + stats.sent, "handshakes attempted,", stats.success || "0", "succeeded,",
-          ((stats.failed / stats.sent) * 100).toFixed(DIGITS_PERC) + "% failed",
-          "\nrtt min/avg/max/stdev =", min + "/" + avg + "/" + max + "/" + dev, "ms");
+    writeLine(
+      "\n---", host, pkg.name + " statistics", "---",
+      "\n" + stats.sent, "handshakes attempted,", stats.success || "0", "succeeded,",
+      ((stats.failed / stats.sent) * 100).toFixed(DIGITS_PERC) + "% failed",
+      "\nrtt min/avg/max/stdev =", min + "/" + avg + "/" + max + "/" + dev, "ms"
+    );
 
     process.exit(stats.success === 0 && 1 || 0);
   } else {
@@ -239,9 +237,9 @@ function timestamp() {
   let secs = now.getSeconds();
 
   if (month < 10) month = "0" + month;
-  if (day   < 10) day   = "0" + day;
-  if (hrs   < 10) hrs   = "0" + hrs;
-  if (mins  < 10) mins  = "0" + mins;
-  if (secs  < 10) secs  = "0" + secs;
-  return year + "-"  + month + "-" + day + " " + hrs + ":" + mins + ":" + secs;
+  if (day < 10) day = "0" + day;
+  if (hrs < 10) hrs = "0" + hrs;
+  if (mins < 10) mins = "0" + mins;
+  if (secs < 10) secs = "0" + secs;
+  return year + "-" + month + "-" + day + " " + hrs + ":" + mins + ":" + secs;
 }

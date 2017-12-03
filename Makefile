@@ -1,17 +1,18 @@
 lint:
-	eslint --color --quiet *.js
+	node_modules/.bin/eslint --color --quiet *.js
 
 test:
-	node test.js
+	$(MAKE) lint
+	node --throw-deprecation --trace-deprecation test.js
 
 publish:
 	git push -u --tags origin master
 	npm publish
 
 update:
-	ncu --packageFile package.json -ua
+	node_modules/.bin/updates
 	rm -rf node_modules
-	npm install
+	yarn
 
 npm-patch:
 	npm version patch
