@@ -1,6 +1,5 @@
 "use strict";
 
-const extend = require("util-extend");
 const events = require("events");
 const net    = require("net");
 const util   = require("util");
@@ -15,7 +14,7 @@ const Tcpie = function(host, port, opts) {
   this.host = host;
   this.port = port;
 
-  this.opts = extend({
+  this.opts = Object.assign({
     interval: 1000,
     timeout : 3000,
     count   : Infinity

@@ -8,7 +8,7 @@ tcpie is a tool to measure latency and verify the reliabilty of a TCP connection
 ### Installation
 Install [Node.js](https://nodejs.org) and then do:
 ```
-$ sudo npm install -g tcpie
+$ npm install -g tcpie
 ```
 ### Example
 ```

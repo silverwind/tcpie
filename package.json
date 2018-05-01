@@ -7,7 +7,7 @@
   "license": "BSD-2-Clause",
   "bin": "tcpie.js",
   "scripts": {
-    "test": "make update"
+    "test": "make test"
   },
   "engines": {
     "node": ">=4"
@@ -33,8 +33,7 @@
     "compute-stdev": "^1.0.0",
     "epipebomb": "^1.0.0",
     "minimist": "^1.2.0",
-    "port-numbers": "^2.0.28",
-    "util-extend": "^1.0.3"
+    "port-numbers": "^2.0.28"
   },
   "devDependencies": {
     "eslint": "^4.19.1",
