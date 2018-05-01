@@ -29,15 +29,15 @@
     "tcpie.js"
   ],
   "dependencies": {
-    "chalk": "^2.3.0",
+    "chalk": "^2.4.1",
     "compute-stdev": "^1.0.0",
     "epipebomb": "^1.0.0",
     "minimist": "^1.2.0",
-    "port-numbers": "^2.0.12",
+    "port-numbers": "^2.0.28",
     "util-extend": "^1.0.3"
   },
   "devDependencies": {
-    "eslint": "^4.12.1",
-    "updates": "^1.3.0"
+    "eslint": "^4.19.1",
+    "updates": "^2.7.2"
   }
 }
