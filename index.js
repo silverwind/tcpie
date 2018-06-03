@@ -1,8 +1,8 @@
 "use strict";
 
 const events = require("events");
-const net    = require("net");
-const util   = require("util");
+const net = require("net");
+const util = require("util");
 
 const Tcpie = function(host, port, opts) {
   if (!(this instanceof Tcpie)) return new Tcpie();
@@ -29,16 +29,20 @@ const Tcpie = function(host, port, opts) {
 
 util.inherits(Tcpie, events.EventEmitter);
 
-Tcpie.prototype.start = function start() {
+Tcpie.prototype.start = function start(subsequent) {
   const self = this;
 
-  if (self.stats.sent >= self.opts.count) return;
+  if (!subsequent) {
+    self.stats.sent = 0;
+    self.stats.success = 0;
+    self.stats.failed = 0;
+  }
 
-  self._next = setTimeout(start.bind(self), self.opts.interval);
+  self._next = setTimeout(start.bind(self, true), self.opts.interval);
 
-  const socket    = new net.Socket();
+  const socket = new net.Socket();
   const startTime = now();
-  let done      = false;
+  let done = false;
 
   socket.setTimeout(self.opts.timeout);
   socket.on("timeout", function() {

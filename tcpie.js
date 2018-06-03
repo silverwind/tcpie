@@ -6,7 +6,13 @@ const pkg = require("./package.json");
 // avoid EPIPE on partially consumed streams
 require("epipebomb")();
 
-const args   = require("minimist")(process.argv.slice(2), {
+const chalk = require("chalk");
+const net = require("net");
+const dns = require("dns");
+const stdev = require("compute-stdev");
+const tcpie = require(".");
+
+const args = require("minimist")(process.argv.slice(2), {
   boolean: [
     "color", "C",
     "timestamp", "T",
@@ -14,15 +20,10 @@ const args   = require("minimist")(process.argv.slice(2), {
     "version", "v"
   ]
 });
-const chalk  = require("chalk");
-const net    = require("net");
-const dns    = require("dns");
-const stdev  = require("compute-stdev");
-const tcpie  = require("./");
 
-const DIGITS_LINE  = 1;
+const DIGITS_LINE = 1;
 const DIGITS_STATS = 3;
-const DIGITS_PERC  = 0;
+const DIGITS_PERC = 0;
 const DEFAULT_PORT = 80;
 
 const usage = [
@@ -58,11 +59,11 @@ if (!args._.length || args._.length > 2 || (args._[1] && isNaN(parseInt(args._[1
   help();
 }
 
-let host    = args._[0];
-const opts    = {};
-let port    = parseInt(args._[1]);
+let host = args._[0];
+const opts = {};
+let port = parseInt(args._[1]);
 let printed = false;
-const rtts    = [];
+const rtts = [];
 let stats;
 
 if (typeof host !== "string") {
@@ -100,7 +101,7 @@ if (args.C) chalk.enabled = false;
 
 // Do a DNS lookup and start the connects
 if (!net.isIP(host)) {
-  dns.lookup(host, function(err, address) {
+  dns.lookup(host, (err, address) => {
     if (!err) {
       printStart(host, address, port);
       run(host, port, opts);
@@ -118,14 +119,14 @@ if (!net.isIP(host)) {
 function run(host, port, opts) {
   const pie = tcpie(host, port, opts);
 
-  pie.on("error", function(err, data) {
+  pie.on("error", (err, data) => {
     stats = data;
     writeLine(
       chalk.red("error connecting to", data.target.host + ":" + data.target.port),
       "seq=" + data.sent,
       "error=" + chalk.red(err.code)
     );
-  }).on("connect", function(data) {
+  }).on("connect", data => {
     stats = data;
     rtts.push(data.rtt);
     writeLine(
@@ -134,7 +135,7 @@ function run(host, port, opts) {
       "srcport=" + data.socket.localPort,
       "time=" + colorRTT(data.rtt.toFixed(DIGITS_LINE))
     );
-  }).on("timeout", function(data) {
+  }).on("timeout", data => {
     stats = data;
     writeLine(
       chalk.red("timeout connecting to", data.target.host + ":" + data.target.port),
@@ -145,7 +146,7 @@ function run(host, port, opts) {
 
   if (process.stdin.isTTY) {
     process.stdin.setRawMode(true);
-    process.stdin.on("data", function(bytes) {
+    process.stdin.on("data", bytes => {
       // http://nemesis.lonestar.org/reference/telecom/codes/ascii.html
       const exitCodes = [
         3,  // SIGINT
@@ -178,7 +179,7 @@ function printEnd() {
   if (printed) process.exit(stats.success === 0 && 1 || 0);
 
   if (stats && stats.sent > 0) {
-    rtts.forEach(function(rtt) {
+    rtts.forEach(rtt => {
       if (rtt <= min) min = rtt.toFixed(DIGITS_STATS);
       if (rtt >= max) max = rtt.toFixed(DIGITS_STATS);
       sum += rtt;
@@ -209,9 +210,8 @@ function colorRTT(rtt) {
   return chalk[rtt >= 150 ? "red" : rtt >= 75 ? "yellow" : "green"](rtt) + " ms";
 }
 
-function writeLine() {
-  let arg = [].slice.call(arguments);
-  arg = arg.filter(function(string) { return Boolean(string); });
+function writeLine(...arg) {
+  arg = arg.filter(string => Boolean(string));
   if ((args.timeout || args.T) && arg[0][0] !== "\n") arg.unshift(timestamp());
   arg.push("\n");
   const stream = (process.stdout._type === "pipe" && printed) ? process.stderr : process.stdout;
