@@ -24,11 +24,11 @@ const args = require("minimist")(process.argv.slice(2), {
 const DIGITS_LINE = 1;
 const DIGITS_STATS = 3;
 const DIGITS_PERC = 0;
-const DEFAULT_PORT = 80;
+const DEFAULT_PORT = 22;
 
 const usage = [
   "",
-  "    Usage: tcpie [options] host[:port]|url [port|80]",
+  "    Usage: tcpie [options] host[:port]|url [port|22]",
   "",
   "    Options:",
   "",

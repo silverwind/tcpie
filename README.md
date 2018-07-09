@@ -26,7 +26,7 @@ rtt min/avg/max/stdev = 10.012/10.970/12.854/1.190 ms
 ```
 ## Usage
 ```
-Usage: tcpie [options] host[:port]|url [port|80]
+Usage: tcpie [options] host[:port]|url [port|22]
 
 Options:
 
@@ -55,7 +55,7 @@ $ npm install --save tcpie
 ### Example
 ```js
 var tcpie = require('tcpie');
-var pie = tcpie('google.com', 80, {count: 10, interval: 500, timeout: 2000});
+var pie = tcpie('google.com', 443, {count: 10, interval: 500, timeout: 2000});
 
 pie.on('connect', function(stats) {
   console.info('connect', stats);
@@ -69,13 +69,13 @@ pie.on('connect', function(stats) {
   // ->   sent: 10,
   // ->   success: 10,
   // ->   failed: 0,
-  // ->   target: { host: 'google.com', port: 80 }
+  // ->   target: { host: 'google.com', port: 443 }
   // -> }
 }).start();
 ```
 #### tcpie(host, [port], [options])
 - `host` *string* : the destination host name or IP address. Required.
-- `port` *number* : the destination port. Default: `80`.
+- `port` *number* : the destination port. Default: `22`.
 - `opts` *object* : options for count, interval and timeout. Defaults: `Infinity`, `1000`, `3000`.
 
 #### *options* object
