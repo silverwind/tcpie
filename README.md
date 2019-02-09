@@ -8,7 +8,7 @@ tcpie is a tool to measure latency and verify the reliabilty of a TCP connection
 ### Installation
 Install [Node.js](https://nodejs.org) and then do:
 ```
-$ npm install -g tcpie
+$ npm i -g tcpie
 ```
 ### Example
 ```
@@ -50,12 +50,12 @@ Examples:
 ## Module API
 ### Installation
 ```
-$ npm install --save tcpie
+$ npm i tcpie
 ```
 ### Example
 ```js
-var tcpie = require('tcpie');
-var pie = tcpie('google.com', 443, {count: 10, interval: 500, timeout: 2000});
+const tcpie = require('tcpie');
+const pie = tcpie('google.com', 443, {count: 10, interval: 500, timeout: 2000});
 
 pie.on('connect', function(stats) {
   console.info('connect', stats);
@@ -77,6 +77,12 @@ pie.on('connect', function(stats) {
 - `host` *string* : the destination host name or IP address. Required.
 - `port` *number* : the destination port. Default: `22`.
 - `opts` *object* : options for count, interval and timeout. Defaults: `Infinity`, `1000`, `3000`.
+
+#### tcpie#start()
+Start connecting
+
+#### tcpie#stop()
+Stops connecting
 
 #### *options* object
 - `count`    *number* : the number of connection attempts in milliseconds (default: Infinity).

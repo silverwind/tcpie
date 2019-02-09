@@ -30,56 +30,61 @@ const Tcpie = function(host, port, opts) {
 util.inherits(Tcpie, events.EventEmitter);
 
 Tcpie.prototype.start = function start(subsequent) {
-  const self = this;
-
   if (!subsequent) {
-    self.stats.sent = 0;
-    self.stats.success = 0;
-    self.stats.failed = 0;
+    this.stats.sent = 0;
+    this.stats.success = 0;
+    this.stats.failed = 0;
   }
 
-  self._next = setTimeout(start.bind(self, true), self.opts.interval);
+  this._next = setTimeout(start.bind(this, true), this.opts.interval);
+  this._done = false;
+  this._abort = false;
+  this._socket = new net.Socket();
+  this._startTime = now();
 
-  const socket = new net.Socket();
-  const startTime = now();
-  let done = false;
-
-  socket.setTimeout(self.opts.timeout);
-  socket.on("timeout", function() {
-    if (!done) {
-      done = true;
-      self.stats.sent++;
-      self.stats.failed++;
-      self.emit("timeout", addDetails(self, this));
-      socket.destroy();
-      checkEnd(self);
+  this._socket.setTimeout(this.opts.timeout);
+  this._socket.on("timeout", () => {
+    if (!this._done) {
+      this._done = true;
+      this.stats.sent++;
+      this.stats.failed++;
+      this.emit("timeout", addDetails(this, this));
+      this._socket.destroy();
+      checkEnd(this);
     }
   });
 
-  socket.on("error", function(err) {
-    if (!done) {
-      done = true;
-      self.stats.sent++;
-      self.stats.failed++;
-      self.emit("error", err, addDetails(self, this));
-      socket.destroy();
-      checkEnd(self);
+  this._socket.on("error", err => {
+    if (!this._done) {
+      this._done = true;
+      this.stats.sent++;
+      this.stats.failed++;
+      this.emit("error", err, addDetails(this, this));
+      this._socket.destroy();
+      checkEnd(this);
     }
   });
 
-  socket.connect(self.port, self.host, function() {
-    if (!done) {
-      done = true;
-      self.stats.sent++;
-      self.stats.success++;
-      self.stats.rtt = (now() - startTime) / 1e6;
-      self.emit("connect", addDetails(self, this));
-      socket.end();
-      checkEnd(self);
+  this._socket.connect(this.port, this.host, () => {
+    if (!this._done) {
+      this._done = true;
+      this.stats.sent++;
+      this.stats.success++;
+      this.stats.rtt = (now() - this._startTime) / 1e6;
+      this.emit("connect", addDetails(this, this));
+      this._socket.end();
+      checkEnd(this);
     }
   });
 
-  return self;
+  return this;
+};
+
+Tcpie.prototype.end = function end() {
+  this._abort = true;
+  this._socket.end();
+  checkEnd(this);
+  return this;
 };
 
 module.exports = function(host, port, opts) {
@@ -87,12 +92,12 @@ module.exports = function(host, port, opts) {
 };
 
 // add details to stats object
-function addDetails(self, socket) {
-  const ret = self.stats;
+function addDetails(that, socket) {
+  const ret = that.stats;
 
   ret.target = {
-    host: self.host,
-    port: self.port
+    host: that.host,
+    port: that.port
   };
 
   ret.socket = {
@@ -106,17 +111,17 @@ function addDetails(self, socket) {
 }
 
 // check end condition
-function checkEnd(self) {
-  if ((self.stats.failed + self.stats.success) >= self.opts.count) {
-    if (self._next) clearTimeout(self._next);
+function checkEnd(that) {
+  if (that._abort || ((that.stats.failed + that.stats.success) >= that.opts.count)) {
+    if (that._next) clearTimeout(that._next);
 
-    self.emit("end", {
-      sent   : self.stats.sent,
-      success: self.stats.success,
-      failed : self.stats.failed,
+    that.emit("end", {
+      sent   : that.stats.sent,
+      success: that.stats.success,
+      failed : that.stats.failed,
       target : {
-        host: self.host,
-        port: self.port
+        host: that.host,
+        port: that.port
       }
     });
   }
