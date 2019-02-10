@@ -80,7 +80,7 @@ Tcpie.prototype.start = function start(subsequent) {
   return this;
 };
 
-Tcpie.prototype.end = function end() {
+Tcpie.prototype.stop = function stop() {
   this._abort = true;
   this._socket.end();
   checkEnd(this);

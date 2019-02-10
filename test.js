@@ -18,7 +18,7 @@ pie2.on("connect", stats => {
   assert.equal(stats.sent, 1);
   assert.equal(stats.success, 1);
   assert.equal(stats.failed, 0);
-  pie2.end();
+  pie2.stop();
 }).on("end", stats => {
   assert.equal(stats.sent, 1);
   assert.equal(stats.success, 1);
