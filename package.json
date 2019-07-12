@@ -10,7 +10,7 @@
     "test": "make test"
   },
   "engines": {
-    "node": ">=6"
+    "node": ">=8"
   },
   "keywords": [
     "tcp",
@@ -33,11 +33,11 @@
     "compute-stdev": "1.0.0",
     "epipebomb": "1.0.0",
     "minimist": "1.2.0",
-    "port-numbers": "4.0.4"
+    "port-numbers": "4.0.13"
   },
   "devDependencies": {
-    "eslint": "5.13.0",
-    "eslint-config-silverwind": "2.0.14",
-    "updates": "7.0.0"
+    "eslint": "6.0.1",
+    "eslint-config-silverwind": "4.0.2",
+    "updates": "8.4.1"
   }
 }
