@@ -132,8 +132,8 @@ function run(host, port, opts) {
     writeLine(
       chalk.green("connected to", data.target.host + ":" + data.target.port),
       "seq=" + data.sent,
-      "srcport=" + data.socket.localPort,
-      "time=" + colorRTT(data.rtt.toFixed(DIGITS_LINE))
+      (data.socket.localPort !== undefined) ? "srcport=" + data.socket.localPort : "",
+      "time=" + colorRTT(data.rtt.toFixed(DIGITS_LINE)),
     );
   }).on("timeout", data => {
     stats = data;
