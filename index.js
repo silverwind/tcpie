@@ -6,9 +6,7 @@ const util = require("util");
 
 const Tcpie = function(host, port, opts) {
   if (!(this instanceof Tcpie)) return new Tcpie();
-
   if (typeof host !== "string") throw new Error("host is required");
-
   if (typeof port === "undefined") port = 80;
 
   this.host = host;
@@ -16,14 +14,14 @@ const Tcpie = function(host, port, opts) {
 
   this.opts = Object.assign({
     interval: 1000,
-    timeout : 3000,
-    count   : Infinity
+    timeout: 3000,
+    count: Infinity
   }, opts);
 
   this.stats = {
-    sent   : 0,
+    sent: 0,
     success: 0,
-    failed : 0
+    failed: 0
   };
 };
 
@@ -101,10 +99,10 @@ function addDetails(that, socket) {
   };
 
   ret.socket = {
-    localAddress  : socket.localAddress,
-    localPort     : socket.localPort,
-    remoteAddress : socket.remoteAddress,
-    remotePort    : socket.remotePort
+    localAddress: socket.localAddress,
+    localPort: socket.localPort,
+    remoteAddress: socket.remoteAddress,
+    remotePort: socket.remotePort
   };
 
   return ret;
@@ -116,10 +114,10 @@ function checkEnd(that) {
     if (that._next) clearTimeout(that._next);
 
     that.emit("end", {
-      sent   : that.stats.sent,
+      sent: that.stats.sent,
       success: that.stats.success,
-      failed : that.stats.failed,
-      target : {
+      failed: that.stats.failed,
+      target: {
         host: that.host,
         port: that.port
       }

@@ -33,11 +33,11 @@
     "compute-stdev": "1.0.0",
     "epipebomb": "1.0.0",
     "minimist": "1.2.0",
-    "port-numbers": "4.0.13"
+    "port-numbers": "4.0.17"
   },
   "devDependencies": {
-    "eslint": "6.0.1",
-    "eslint-config-silverwind": "4.0.2",
-    "updates": "8.4.1"
+    "eslint": "6.6.0",
+    "eslint-config-silverwind": "5.0.0",
+    "updates": "9.0.1"
   }
 }
