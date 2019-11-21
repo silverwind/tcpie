@@ -1,5 +1,5 @@
 lint:
-	node_modules/.bin/eslint --color --quiet *.js
+	npx eslint --color --quiet *.js
 
 test:
 	$(MAKE) lint
@@ -10,23 +10,23 @@ publish:
 	npm publish
 
 update:
-	node_modules/.bin/updates -u
+	npx updates -u
 	rm -rf node_modules
-	yarn
+	npm i
 
 patch:
 	$(MAKE) test
-	npx ver -C patch
+	npx versions -C patch
 	$(MAKE) publish
 
 minor:
 	$(MAKE) test
-	npx ver -C minor
+	npx versions -C minor
 	$(MAKE) publish
 
 major:
 	$(MAKE) test
-	npx ver -C major
+	npx versions -C major
 	$(MAKE) publish
 
 .PHONY: lint test publish update patch minor major
