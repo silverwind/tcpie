@@ -51,7 +51,7 @@ const usage = [
 ].join("\n");
 
 if (args.v) {
-  process.stdout.write(pkg.version + "\n");
+  process.stdout.write(`${pkg.version}\n`);
   process.exit(0);
 }
 
@@ -84,11 +84,11 @@ if (/.+:\/\/.+/.test(host)) {
   host = url.host;
   port = url.port || require("port-numbers").getPort(proto).port;
   if (!port) {
-    writeLine(chalk.red("ERROR:"), "Unknown protocol '" + proto + "'");
+    writeLine(chalk.red("ERROR:"), `Unknown protocol '${proto}'`);
     process.exit(1);
   }
   if (!host) {
-    writeLine(chalk.red("ERROR:"), "Missing host in '" + host + "'");
+    writeLine(chalk.red("ERROR:"), `Missing host in '${host}'`);
   }
 }
 
@@ -106,7 +106,7 @@ if (!net.isIP(host)) {
       printStart(host, address, port);
       run(host, port, opts);
     } else {
-      if (err.code === "ENOTFOUND") writeLine(chalk.red("ERROR:"), "Host '" + host + "' not found");
+      if (err.code === "ENOTFOUND") writeLine(chalk.red("ERROR:"), `Host '${host}' not found`);
       else writeLine(chalk.red("ERROR:"), err.code, err.syscall || "");
       process.exit(1);
     }
@@ -122,25 +122,25 @@ function run(host, port, opts) {
   pie.on("error", (err, data) => {
     stats = data;
     writeLine(
-      chalk.red("error connecting to", data.target.host + ":" + data.target.port),
-      "seq=" + data.sent,
-      "error=" + chalk.red(err.code)
+      chalk.red("error connecting to", `${data.target.host}:${data.target.port}`),
+      `seq=${data.sent}`,
+      `error=${chalk.red(err.code)}`
     );
   }).on("connect", data => {
     stats = data;
     rtts.push(data.rtt);
     writeLine(
-      chalk.green("connected to", data.target.host + ":" + data.target.port),
-      "seq=" + data.sent,
-      (data.socket.localPort !== undefined) ? "srcport=" + data.socket.localPort : "",
-      "time=" + colorRTT(data.rtt.toFixed(DIGITS_LINE)),
+      chalk.green("connected to", `${data.target.host}:${data.target.port}`),
+      `seq=${data.sent}`,
+      (data.socket.localPort !== undefined) ? `srcport=${data.socket.localPort}` : "",
+      `time=${colorRTT(data.rtt.toFixed(DIGITS_LINE))}`,
     );
   }).on("timeout", data => {
     stats = data;
     writeLine(
-      chalk.red("timeout connecting to", data.target.host + ":" + data.target.port),
-      "seq=" + data.sent,
-      data.socket.localPort && "srcport=" + data.socket.localPort
+      chalk.red("timeout connecting to", `${data.target.host}:${data.target.port}`),
+      `seq=${data.sent}`,
+      data.socket.localPort && `srcport=${data.socket.localPort}`
     );
   });
 
@@ -155,7 +155,7 @@ function run(host, port, opts) {
         28, // SIGQUIT
       ];
       for (let i = 0; i < bytes.length; i++) {
-        if (exitCodes.indexOf(bytes[i]) !== -1) printEnd();
+        if (exitCodes.includes(bytes[i])) printEnd();
       }
     });
   } else {
@@ -170,7 +170,7 @@ function run(host, port, opts) {
 }
 
 function printStart(host, address, port) {
-  writeLine(pkg.name.toUpperCase(), host, "(" + address + ")", "port", String(port));
+  writeLine(pkg.name.toUpperCase(), host, `(${address})`, "port", String(port));
 }
 
 function printEnd() {
@@ -194,10 +194,10 @@ function printEnd() {
     printed = true;
 
     writeLine(
-      "\n---", host, pkg.name + " statistics", "---",
-      "\n" + stats.sent, "handshakes attempted,", stats.success || "0", "succeeded,",
-      ((stats.failed / stats.sent) * 100).toFixed(DIGITS_PERC) + "% failed",
-      "\nrtt min/avg/max/stdev =", min + "/" + avg + "/" + max + "/" + dev, "ms"
+      "\n---", host, `${pkg.name} statistics`, "---",
+      `\n${stats.sent}`, "handshakes attempted,", stats.success || "0", "succeeded,",
+      `${((stats.failed / stats.sent) * 100).toFixed(DIGITS_PERC)}% failed`,
+      "\nrtt min/avg/max/stdev =", `${min}/${avg}/${max}/${dev}`, "ms"
     );
 
     process.exit(stats.success === 0 && 1 || 0);
@@ -207,7 +207,7 @@ function printEnd() {
 }
 
 function colorRTT(rtt) {
-  return chalk[rtt >= 150 ? "red" : rtt >= 75 ? "yellow" : "green"](rtt) + " ms";
+  return `${chalk[rtt >= 150 ? "red" : rtt >= 75 ? "yellow" : "green"](rtt)} ms`;
 }
 
 function writeLine(...arg) {
@@ -236,10 +236,10 @@ function timestamp() {
   let mins = now.getMinutes();
   let secs = now.getSeconds();
 
-  if (month < 10) month = "0" + month;
-  if (day < 10) day = "0" + day;
-  if (hrs < 10) hrs = "0" + hrs;
-  if (mins < 10) mins = "0" + mins;
-  if (secs < 10) secs = "0" + secs;
-  return year + "-" + month + "-" + day + " " + hrs + ":" + mins + ":" + secs;
+  if (month < 10) month = `0${month}`;
+  if (day < 10) day = `0${day}`;
+  if (hrs < 10) hrs = `0${hrs}`;
+  if (mins < 10) mins = `0${mins}`;
+  if (secs < 10) secs = `0${secs}`;
+  return `${year}-${month}-${day} ${hrs}:${mins}:${secs}`;
 }

@@ -5,13 +5,18 @@
   "author": "silverwind <me@silverwind.io> (https://github.com/silverwind)",
   "repository": "silverwind/tcpie",
   "license": "BSD-2-Clause",
+  "main": "index.js",
   "bin": "tcpie.js",
   "scripts": {
     "test": "make test"
   },
   "engines": {
-    "node": ">=8"
+    "node": ">= 10"
   },
+  "files": [
+    "index.js",
+    "tcpie.js"
+  ],
   "keywords": [
     "tcp",
     "port",
@@ -24,21 +29,18 @@
     "test",
     "testing"
   ],
-  "files": [
-    "index.js",
-    "tcpie.js"
-  ],
   "dependencies": {
-    "chalk": "2.4.2",
+    "chalk": "3.0.0",
     "compute-stdev": "1.0.0",
     "epipebomb": "1.0.0",
     "minimist": "1.2.5",
-    "port-numbers": "4.0.17"
+    "port-numbers": "5.0.10"
   },
   "devDependencies": {
-    "eslint": "6.6.0",
-    "eslint-config-silverwind": "5.0.0",
-    "updates": "9.0.1",
-    "versions": "7.0.2"
+    "eslint": "6.8.0",
+    "eslint-config-silverwind": "10.0.1",
+    "jest": "25.1.0",
+    "updates": "10.2.3",
+    "versions": "8.2.5"
   }
 }
