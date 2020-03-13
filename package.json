@@ -32,7 +32,7 @@
     "chalk": "2.4.2",
     "compute-stdev": "1.0.0",
     "epipebomb": "1.0.0",
-    "minimist": "1.2.0",
+    "minimist": "1.2.5",
     "port-numbers": "4.0.17"
   },
   "devDependencies": {
