@@ -11,7 +11,7 @@
     "test": "make test"
   },
   "engines": {
-    "node": ">= 10"
+    "node": ">=10"
   },
   "files": [
     "index.js",
@@ -30,17 +30,17 @@
     "testing"
   ],
   "dependencies": {
-    "chalk": "3.0.0",
+    "chalk": "4.0.0",
     "compute-stdev": "1.0.0",
     "epipebomb": "1.0.0",
     "minimist": "1.2.5",
-    "port-numbers": "5.0.10"
+    "port-numbers": "6.0.0"
   },
   "devDependencies": {
-    "eslint": "6.8.0",
-    "eslint-config-silverwind": "10.0.1",
-    "jest": "25.1.0",
-    "updates": "10.2.3",
-    "versions": "8.2.5"
+    "eslint": "7.1.0",
+    "eslint-config-silverwind": "13.4.2",
+    "jest": "26.0.1",
+    "updates": "10.2.13",
+    "versions": "8.2.10"
   }
 }
