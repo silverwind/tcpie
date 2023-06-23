@@ -18,7 +18,7 @@
   ],
   "dependencies": {
     "compute-stdev": "1.0.0",
-    "glowie": "1.0.1",
+    "glowie": "1.1.0",
     "minimist": "1.2.8",
     "port-numbers": "7.0.0",
     "supports-color": "9.3.1"
