@@ -1,7 +1,4 @@
-"use strict";
-
-const tcpie = require(".");
-const {test, expect} = global;
+import {tcpie} from "./index.js";
 
 test("first", () => {
   let runs = 0;

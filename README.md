@@ -1,12 +1,13 @@
 # tcpie
-[![](https://img.shields.io/npm/v/tcpie.svg?style=flat)](https://www.npmjs.org/package/tcpie) [![](https://img.shields.io/npm/dm/tcpie.svg)](https://www.npmjs.org/package/tcpie)
+[![](https://img.shields.io/npm/v/tcpie.svg?style=flat)](https://www.npmjs.org/package/tcpie) [![](https://img.shields.io/npm/dm/tcpie.svg)](https://www.npmjs.org/package/tcpie) [![](https://packagephobia.com/badge?p=tcpie)](https://packagephobia.com/result?p=tcpie)
+
 > Ping any TCP port
 
 tcpie is a tool to measure latency and verify the reliabilty of a TCP connection. It does so by initiating a handshake followed by an immediately termination of the socket. While many existing tools require raw socket access, tcpie runs fine in user space. An API for use as a module is also provided.
 
 ## CLI
+
 ### Installation
-Install [Node.js](https://nodejs.org) and then do:
 ```
 $ npm i -g tcpie
 ```
@@ -24,52 +25,27 @@ connected to google.com:443 seq=5 srcport=59057 time=10.4 ms
 5 handshakes attempted, 5 succeeded, 0% failed
 rtt min/avg/max/stdev = 10.012/10.970/12.854/1.190 ms
 ```
-## Usage
-```
-Usage: tcpie [options] host[:port]|url [port|22]
 
-Options:
+## API
 
-  -v, --version       output version
-  -c, --count <n>     number of connects (default: infinite)
-  -i, --interval <n>  wait n seconds between connects (default: 1)
-  -t, --timeout <n>   connection timeout in seconds (default: 3)
-  -T, --timestamp     add timestamps to output
-  -f, --flood         flood mode, connect as fast as possible
-  -C, --no-color      disable color output
-
-Examples:
-
-  $ tcpie google.com
-  $ tcpie -i .1 8.8.8.8:53
-  $ tcpie -c5 -t.05 aspmx.l.google.com 25
-  $ tcpie -i.2 https://google.com
-
-```
-
-## Module API
-### Installation
-```
-$ npm i tcpie
-```
-### Example
+### Usage
 ```js
-const tcpie = require('tcpie');
-const pie = tcpie('google.com', 443, {count: 10, interval: 500, timeout: 2000});
+import {tcpie} from "tcpie";
+const pie = tcpie("google.com", 443, {count: 10, interval: 500, timeout: 2000});
 
-pie.on('connect', function(stats) {
-  console.info('connect', stats);
-}).on('error', function(err, stats) {
+pie.on("connect", function(stats) {
+  console.info("connect", stats);
+}).on("error", function(err, stats) {
   console.error(err, stats);
-}).on('timeout', function(stats) {
-  console.info('timeout', stats);
-}).on('end', function(stats) {
+}).on("timeout", function(stats) {
+  console.info("timeout", stats);
+}).on("end", function(stats) {
   console.info(stats);
   // -> {
   // ->   sent: 10,
   // ->   success: 10,
   // ->   failed: 0,
-  // ->   target: { host: 'google.com', port: 443 }
+  // ->   target: { host: "google.com", port: 443 }
   // -> }
 }).start();
 ```

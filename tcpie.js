@@ -1,18 +1,15 @@
 #!/usr/bin/env node
-"use strict";
+import {red, yellow, green, disableColor} from "glowie";
+import {isIP} from "node:net";
+import {lookup} from "node:dns";
+import process, {exit, argv, stdin, stdout, stderr} from "node:process";
+import stdev from "compute-stdev";
+import {tcpie} from "./index.js";
+import minimist from "minimist";
+import {getPort} from "port-numbers";
+import supportsColor from "supports-color";
 
-const pkg = require("./package.json");
-
-// avoid EPIPE on partially consumed streams
-require("epipebomb")();
-
-const chalk = require("chalk");
-const net = require("net");
-const dns = require("dns");
-const stdev = require("compute-stdev");
-const tcpie = require(".");
-
-const args = require("minimist")(process.argv.slice(2), {
+const args = minimist(argv.slice(2), {
   boolean: [
     "color", "C",
     "timestamp", "T",
@@ -21,6 +18,7 @@ const args = require("minimist")(process.argv.slice(2), {
   ]
 });
 
+const packageVersion = import.meta.VERSION || "0.0.0";
 const DIGITS_LINE = 1;
 const DIGITS_STATS = 3;
 const DIGITS_PERC = 0;
@@ -51,11 +49,11 @@ const usage = [
 ].join("\n");
 
 if (args.v) {
-  process.stdout.write(`${pkg.version}\n`);
-  process.exit(0);
+  console.info(packageVersion);
+  exit(0);
 }
 
-if (!args._.length || args._.length > 2 || (args._[1] && isNaN(parseInt(args._[1])))) {
+if (!args._.length || args._.length > 2 || (args._[1] && Number.isNaN(parseInt(args._[1])))) {
   help();
 }
 
@@ -79,16 +77,18 @@ if (matches && matches.length === 3 && !port) {
 
 // url syntax
 if (/.+:\/\/.+/.test(host)) {
-  const url = require("url").parse(host);
-  const proto = url.protocol.replace(":", "");
-  host = url.host;
-  port = url.port || require("port-numbers").getPort(proto).port;
+  const {protocol, hostname, port: p} = new URL(host);
+  const proto = protocol.replace(":", "");
+  host = hostname;
+  port = p ?? getPort(proto).port;
+
   if (!port) {
-    writeLine(chalk.red("ERROR:"), `Unknown protocol '${proto}'`);
-    process.exit(1);
+    writeLine(red("ERROR:"), `Unknown protocol '${proto}'`);
+    exit(1);
   }
   if (!host) {
-    writeLine(chalk.red("ERROR:"), `Missing host in '${host}'`);
+    writeLine(red("ERROR:"), `Missing host in '${host}'`);
+    exit(1);
   }
 }
 
@@ -97,18 +97,18 @@ if (args.count || args.c) opts.count = parseInt(args.count || args.c);
 if (args.interval || args.i) opts.interval = secondsToMs(args.interval || args.i);
 if (args.timeout || args.t) opts.timeout = secondsToMs(args.timeout || args.t);
 if (args.flood || args.f) opts.interval = 0;
-if (args.C) chalk.enabled = false;
+if (args.C || !supportsColor.stdout) disableColor();
 
 // Do a DNS lookup and start the connects
-if (!net.isIP(host)) {
-  dns.lookup(host, (err, address) => {
+if (!isIP(host)) {
+  lookup(host, (err, address) => {
     if (!err) {
       printStart(host, address, port);
       run(host, port, opts);
     } else {
-      if (err.code === "ENOTFOUND") writeLine(chalk.red("ERROR:"), `Host '${host}' not found`);
-      else writeLine(chalk.red("ERROR:"), err.code, err.syscall || "");
-      process.exit(1);
+      if (err.code === "ENOTFOUND") writeLine(red("ERROR:"), `Host '${host}' not found`);
+      else writeLine(red("ERROR:"), err.code, err.syscall || "");
+      exit(1);
     }
   });
 } else {
@@ -122,15 +122,15 @@ function run(host, port, opts) {
   pie.on("error", (err, data) => {
     stats = data;
     writeLine(
-      chalk.red("error connecting to", `${data.target.host}:${data.target.port}`),
+      red("error connecting to", `${data.target.host}:${data.target.port}`),
       `seq=${data.sent}`,
-      `error=${chalk.red(err.code)}`
+      `error=${red(err.code)}`
     );
   }).on("connect", data => {
     stats = data;
     rtts.push(data.rtt);
     writeLine(
-      chalk.green("connected to", `${data.target.host}:${data.target.port}`),
+      green("connected to", `${data.target.host}:${data.target.port}`),
       `seq=${data.sent}`,
       (data.socket.localPort !== undefined) ? `srcport=${data.socket.localPort}` : "",
       `time=${colorRTT(data.rtt.toFixed(DIGITS_LINE))}`,
@@ -138,15 +138,15 @@ function run(host, port, opts) {
   }).on("timeout", data => {
     stats = data;
     writeLine(
-      chalk.red("timeout connecting to", `${data.target.host}:${data.target.port}`),
+      red("timeout connecting to", `${data.target.host}:${data.target.port}`),
       `seq=${data.sent}`,
       data.socket.localPort && `srcport=${data.socket.localPort}`
     );
   });
 
-  if (process.stdin.isTTY) {
-    process.stdin.setRawMode(true);
-    process.stdin.on("data", bytes => {
+  if (stdin.isTTY) {
+    stdin.setRawMode(true);
+    stdin.on("data", bytes => {
       // http://nemesis.lonestar.org/reference/telecom/codes/ascii.html
       const exitCodes = [
         3,  // SIGINT
@@ -159,10 +159,10 @@ function run(host, port, opts) {
       }
     });
   } else {
-    process.on("SIGINT", process.exit);
-    process.on("SIGQUIT", process.exit);
-    process.on("SIGTERM", process.exit);
-    process.on("SIGTSTP", process.exit);
+    process.on("SIGINT", exit);
+    process.on("SIGQUIT", exit);
+    process.on("SIGTERM", exit);
+    process.on("SIGTSTP", exit);
   }
 
   process.on("exit", printEnd);
@@ -170,57 +170,63 @@ function run(host, port, opts) {
 }
 
 function printStart(host, address, port) {
-  writeLine(pkg.name.toUpperCase(), host, `(${address})`, "port", String(port));
+  writeLine("TCPIE", host, `(${address})`, "port", String(port));
 }
 
 function printEnd() {
   let sum = 0, min = Infinity, max = 0, avg, dev;
 
-  if (printed) process.exit(stats.success === 0 && 1 || 0);
+  if (printed) exit(stats.success === 0 && 1 || 0);
 
   if (stats && stats.sent > 0) {
-    rtts.forEach(rtt => {
+    for (const rtt of rtts) {
       if (rtt <= min) min = rtt.toFixed(DIGITS_STATS);
       if (rtt >= max) max = rtt.toFixed(DIGITS_STATS);
       sum += rtt;
-    });
+    }
 
     avg = (sum / rtts.length).toFixed(DIGITS_STATS);
     dev = stdev(rtts).toFixed(DIGITS_STATS);
 
     if (min === Infinity) min = "0";
-    if (isNaN(avg)) avg = "0";
+    if (Number.isNaN(avg)) avg = "0";
 
     printed = true;
 
     writeLine(
-      "\n---", host, `${pkg.name} statistics`, "---",
+      "\n---", host, `tcpie statistics`, "---",
       `\n${stats.sent}`, "handshakes attempted,", stats.success || "0", "succeeded,",
       `${((stats.failed / stats.sent) * 100).toFixed(DIGITS_PERC)}% failed`,
       "\nrtt min/avg/max/stdev =", `${min}/${avg}/${max}/${dev}`, "ms"
     );
 
-    process.exit(stats.success === 0 && 1 || 0);
+    exit(stats.success === 0 && 1 || 0);
   } else {
-    process.exit(1);
+    exit(1);
   }
 }
 
 function colorRTT(rtt) {
-  return `${chalk[rtt >= 150 ? "red" : rtt >= 75 ? "yellow" : "green"](rtt)} ms`;
+  if (rtt >= 150) {
+    return `${red(rtt)} ms`;
+  } else if (rtt >= 75) {
+    return `${yellow(rtt)} ms`;
+  } else {
+    return `${green(rtt)} ms`;
+  }
 }
 
 function writeLine(...arg) {
-  arg = arg.filter(string => Boolean(string));
+  arg = arg.filter(Boolean);
   if ((args.timeout || args.T) && arg[0][0] !== "\n") arg.unshift(timestamp());
   arg.push("\n");
-  const stream = (process.stdout._type === "pipe" && printed) ? process.stderr : process.stdout;
+  const stream = (stdout._type === "pipe" && printed) ? stderr : stdout;
   stream.write(arg.join(" "));
 }
 
 function help() {
-  process.stdout.write(usage);
-  process.exit(1);
+  stdout.write(usage);
+  exit(1);
 }
 
 function secondsToMs(s) {

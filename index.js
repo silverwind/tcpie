@@ -1,22 +1,18 @@
-"use strict";
-
-const events = require("events");
-const net = require("net");
-const util = require("util");
+import events from "node:events";
+import net from "node:net";
+import util from "node:util";
 
 const Tcpie = function(host, port, opts) {
   if (!(this instanceof Tcpie)) return new Tcpie();
   if (typeof host !== "string") throw new Error("host is required");
-  if (typeof port === "undefined") port = 80;
+  if (port === undefined) port = 80;
 
   this.host = host;
   this.port = port;
 
-  this.opts = Object.assign({
-    interval: 1000,
+  this.opts = {interval: 1000,
     timeout: 3000,
-    count: Infinity
-  }, opts);
+    count: Infinity, ...opts};
 
   this.stats = {
     sent: 0,
@@ -38,7 +34,7 @@ Tcpie.prototype.start = function start(subsequent) {
   this._done = false;
   this._abort = false;
   this._socket = new net.Socket();
-  this._startTime = now();
+  this._startTime = performance.now();
 
   this._socket.setTimeout(this.opts.timeout);
   this._socket.on("timeout", () => {
@@ -68,7 +64,7 @@ Tcpie.prototype.start = function start(subsequent) {
       this._done = true;
       this.stats.sent++;
       this.stats.success++;
-      this.stats.rtt = (now() - this._startTime) / 1e6;
+      this.stats.rtt = (performance.now() - this._startTime);
       this.emit("connect", addDetails(this, this));
       this._socket.end();
       checkEnd(this);
@@ -85,9 +81,9 @@ Tcpie.prototype.stop = function stop() {
   return this;
 };
 
-module.exports = function(host, port, opts) {
-  return new Tcpie(host, port, opts);
-};
+export function tcpie(...args) {
+  return new Tcpie(...args);
+}
 
 // add details to stats object
 function addDetails(that, socket) {
@@ -123,10 +119,4 @@ function checkEnd(that) {
       }
     });
   }
-}
-
-// get current timestamp in nanoseconds
-function now() {
-  const hrtime = process.hrtime();
-  return hrtime[0] * 1e9 + hrtime[1];
 }

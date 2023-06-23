@@ -2,45 +2,33 @@
   "name": "tcpie",
   "version": "9.0.1",
   "description": "Ping any TCP port",
-  "author": "silverwind <me@silverwind.io> (https://github.com/silverwind)",
+  "author": "silverwind <me@silverwind.io>",
   "repository": "silverwind/tcpie",
   "license": "BSD-2-Clause",
-  "main": "index.js",
-  "bin": "tcpie.js",
-  "scripts": {
-    "test": "make test"
-  },
+  "exports": "./index.js",
+  "bin": "./tcpie.js",
+  "type": "module",
+  "sideEffects": false,
   "engines": {
-    "node": ">=10"
+    "node": ">=16"
   },
   "files": [
-    "index.js",
-    "tcpie.js"
-  ],
-  "keywords": [
-    "tcp",
-    "port",
-    "socket",
-    "ping",
-    "network",
-    "networking",
-    "connect",
-    "connection",
-    "test",
-    "testing"
+    "./index.js",
+    "./tcpie.js"
   ],
   "dependencies": {
-    "chalk": "4.0.0",
     "compute-stdev": "1.0.0",
-    "epipebomb": "1.0.0",
-    "minimist": "1.2.5",
-    "port-numbers": "6.0.0"
+    "glowie": "1.0.1",
+    "minimist": "1.2.8",
+    "port-numbers": "7.0.0",
+    "supports-color": "9.3.1"
   },
   "devDependencies": {
-    "eslint": "7.1.0",
-    "eslint-config-silverwind": "13.4.2",
-    "jest": "26.0.1",
-    "updates": "10.2.13",
-    "versions": "8.2.10"
+    "eslint": "8.43.0",
+    "eslint-config-silverwind": "73.0.4",
+    "updates": "14.2.8",
+    "versions": "11.0.1",
+    "vitest": "0.32.2",
+    "vitest-config-silverwind": "1.0.0"
   }
 }
