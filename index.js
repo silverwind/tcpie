@@ -1,6 +1,6 @@
-import events from "node:events";
-import net from "node:net";
-import util from "node:util";
+import {EventEmitter} from "node:events";
+import {Socket} from "node:net";
+import {inherits} from "node:util";
 
 const Tcpie = function(host, port, opts) {
   if (!(this instanceof Tcpie)) return new Tcpie();
@@ -21,7 +21,7 @@ const Tcpie = function(host, port, opts) {
   };
 };
 
-util.inherits(Tcpie, events.EventEmitter);
+inherits(Tcpie, EventEmitter);
 
 Tcpie.prototype.start = function start(subsequent) {
   if (!subsequent) {
@@ -33,7 +33,7 @@ Tcpie.prototype.start = function start(subsequent) {
   this._next = setTimeout(start.bind(this, true), this.opts.interval);
   this._done = false;
   this._abort = false;
-  this._socket = new net.Socket();
+  this._socket = new Socket();
   this._startTime = performance.now();
 
   this._socket.setTimeout(this.opts.timeout);
