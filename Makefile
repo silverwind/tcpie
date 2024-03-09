@@ -1,5 +1,5 @@
 SRC := tcpie.js
-DST := bin/tcpie.js
+DST := dist/tcpie.js
 
 node_modules: package-lock.json
 	npm install --no-save

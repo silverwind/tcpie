@@ -6,7 +6,7 @@
   "repository": "silverwind/tcpie",
   "license": "BSD-2-Clause",
   "exports": "./index.js",
-  "bin": "./bin/tcpie.js",
+  "bin": "./dist/tcpie.js",
   "type": "module",
   "sideEffects": false,
   "engines": {
@@ -14,7 +14,7 @@
   },
   "files": [
     "./index.js",
-    "./bin/tcpie.js"
+    "./dist/tcpie.js"
   ],
   "dependencies": {
     "compute-stdev": "1.0.0",
