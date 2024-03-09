@@ -20,15 +20,14 @@
     "compute-stdev": "1.0.0",
     "glowie": "1.2.0",
     "minimist": "1.2.8",
-    "port-numbers": "7.1.0",
     "supports-color": "9.4.0"
   },
   "devDependencies": {
-    "eslint": "8.44.0",
-    "eslint-config-silverwind": "73.1.2",
-    "updates": "14.3.2",
-    "versions": "11.0.1",
-    "vitest": "0.33.0",
-    "vitest-config-silverwind": "5.0.0"
+    "eslint": "8.57.0",
+    "eslint-config-silverwind": "82.0.3",
+    "updates": "15.3.1",
+    "versions": "12.0.1",
+    "vitest": "1.3.1",
+    "vitest-config-silverwind": "5.1.2"
   }
 }

@@ -6,7 +6,6 @@ import process, {exit, argv, stdin, stdout, stderr} from "node:process";
 import stdev from "compute-stdev";
 import {tcpie} from "./index.js";
 import minimist from "minimist";
-import {getPort} from "port-numbers";
 import supportsColor from "supports-color";
 
 const args = minimist(argv.slice(2), {
@@ -26,7 +25,7 @@ const DEFAULT_PORT = 22;
 
 const usage = [
   "",
-  "    Usage: tcpie [options] host[:port]|url [port|22]",
+  "    Usage: tcpie [options] host[:port] [port|22]",
   "",
   "    Options:",
   "",
@@ -43,7 +42,6 @@ const usage = [
   "      $ tcpie google.com",
   "      $ tcpie -i .1 8.8.8.8:53",
   "      $ tcpie -c5 -t.05 aspmx.l.google.com 25",
-  "      $ tcpie -i.2 https://google.com",
   "",
   ""
 ].join("\n");
@@ -73,23 +71,6 @@ const matches = /^(.+):(\d+)$/.exec(host);
 if (matches && matches.length === 3 && !port) {
   host = matches[1];
   port = matches[2];
-}
-
-// url syntax
-if (/.+:\/\/.+/.test(host)) {
-  const {protocol, hostname, port: p} = new URL(host);
-  const proto = protocol.replace(":", "");
-  host = hostname;
-  port = p ?? getPort(proto).port;
-
-  if (!port) {
-    writeLine(red("ERROR:"), `Unknown protocol '${proto}'`);
-    exit(1);
-  }
-  if (!host) {
-    writeLine(red("ERROR:"), `Missing host in '${host}'`);
-    exit(1);
-  }
 }
 
 if (!port) port = DEFAULT_PORT;
