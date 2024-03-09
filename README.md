@@ -1,5 +1,5 @@
 # tcpie
-[![](https://img.shields.io/npm/v/tcpie.svg?style=flat)](https://www.npmjs.org/package/tcpie) [![](https://img.shields.io/npm/dm/tcpie.svg)](https://www.npmjs.org/package/tcpie) [![](https://packagephobia.com/badge?p=tcpie)](https://packagephobia.com/result?p=tcpie)
+[![](https://img.shields.io/npm/v/tcpie.svg?style=flat)](https://www.npmjs.org/package/tcpie) [![](https://img.shields.io/npm/dm/tcpie.svg)](https://www.npmjs.org/package/tcpie) [![](https://img.shields.io/bundlephobia/minzip/tcpie.svg)](https://bundlephobia.com/package/tcpie) [![](https://packagephobia.com/badge?p=tcpie)](https://packagephobia.com/result?p=tcpie)
 
 > Ping any TCP port
 
