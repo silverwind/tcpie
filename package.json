@@ -1,6 +1,6 @@
 {
   "name": "tcpie",
-  "version": "10.0.3",
+  "version": "11.0.0",
   "description": "Ping any TCP port",
   "author": "silverwind <me@silverwind.io>",
   "repository": "silverwind/tcpie",
