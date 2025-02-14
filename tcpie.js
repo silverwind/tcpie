@@ -135,8 +135,8 @@ function run(host, port, opts) {
         26, // SIGTSTP
         28, // SIGQUIT
       ];
-      for (let i = 0; i < bytes.length; i++) {
-        if (exitCodes.includes(bytes[i])) printEnd();
+      for (const byte of bytes) {
+        if (exitCodes.includes(byte)) printEnd();
       }
     });
   } else {
