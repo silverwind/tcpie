@@ -68,7 +68,7 @@ if (typeof host !== "string") {
 
 // host:port syntax
 const matches = /^(.+):(\d+)$/.exec(host);
-if (matches && matches.length === 3 && !port) {
+if (matches?.length === 3 && !port) {
   host = matches[1];
   port = matches[2];
 }

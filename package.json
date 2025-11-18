@@ -23,13 +23,13 @@
     "supports-color": "10.2.2"
   },
   "devDependencies": {
-    "eslint": "9.35.0",
-    "eslint-config-silverwind": "103.0.6",
-    "typescript": "5.9.2",
-    "typescript-config-silverwind": "10.0.1",
-    "updates": "16.7.2",
-    "versions": "13.1.1",
-    "vitest": "3.2.4",
-    "vitest-config-silverwind": "10.2.0"
+    "eslint": "9.39.1",
+    "eslint-config-silverwind": "111.0.8",
+    "typescript": "5.9.3",
+    "typescript-config-silverwind": "13.0.2",
+    "updates": "16.9.1",
+    "versions": "14.0.2",
+    "vitest": "4.0.10",
+    "vitest-config-silverwind": "10.4.2"
   }
 }
