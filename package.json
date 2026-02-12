@@ -30,6 +30,7 @@
     "typescript": "5.9.3",
     "typescript-config-silverwind": "13.0.2",
     "updates": "16.9.1",
+    "updates-config-silverwind": "1.0.3",
     "versions": "14.0.2",
     "vitest": "4.0.10",
     "vitest-config-silverwind": "10.4.2"
