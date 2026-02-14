@@ -29,8 +29,7 @@ $(DST): $(SRC) node_modules
 	chmod +x $(DST)
 
 .PHONY: publish
-publish:
-	git push -u --tags origin master
+publish: node_modules
 	pnpm publish --no-git-checks
 
 .PHONY: update
