@@ -9,7 +9,7 @@
   "bin": "./dist/tcpie.js",
   "type": "module",
   "sideEffects": false,
-  "packageManager": "pnpm@10.28.2",
+  "packageManager": "pnpm@10.29.3",
   "engines": {
     "node": ">=18"
   },
@@ -24,15 +24,15 @@
     "supports-color": "10.2.2"
   },
   "devDependencies": {
-    "esbuild": "0.27.2",
+    "esbuild": "0.27.3",
     "eslint": "9.39.2",
-    "eslint-config-silverwind": "120.1.2",
+    "eslint-config-silverwind": "121.0.5",
     "typescript": "5.9.3",
-    "typescript-config-silverwind": "13.0.2",
-    "updates": "16.9.1",
+    "typescript-config-silverwind": "15.0.0",
+    "updates": "17.5.2",
     "updates-config-silverwind": "1.0.3",
-    "versions": "14.0.2",
-    "vitest": "4.0.10",
-    "vitest-config-silverwind": "10.4.2"
+    "versions": "14.1.2",
+    "vitest": "4.0.18",
+    "vitest-config-silverwind": "10.6.3"
   }
 }
