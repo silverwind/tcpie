@@ -51,13 +51,13 @@ if (args.v) {
   exit(0);
 }
 
-if (!args._.length || args._.length > 2 || (args._[1] && Number.isNaN(parseInt(args._[1])))) {
+if (!args._.length || args._.length > 2 || (args._[1] && Number.isNaN(Number.parseInt(args._[1])))) {
   help();
 }
 
 let host = args._[0];
 const opts = {};
-let port = parseInt(args._[1]);
+let port = Number.parseInt(args._[1]);
 let printed = false;
 const rtts = [];
 let stats;
@@ -74,7 +74,7 @@ if (matches?.length === 3 && !port) {
 }
 
 if (!port) port = DEFAULT_PORT;
-if (args.count || args.c) opts.count = parseInt(args.count || args.c);
+if (args.count || args.c) opts.count = Number.parseInt(args.count || args.c);
 if (args.interval || args.i) opts.interval = secondsToMs(args.interval || args.i);
 if (args.timeout || args.t) opts.timeout = secondsToMs(args.timeout || args.t);
 if (args.flood || args.f) opts.interval = 0;
@@ -211,7 +211,7 @@ function help() {
 }
 
 function secondsToMs(s) {
-  return (parseFloat(s) * 1000);
+  return (Number.parseFloat(s) * 1000);
 }
 
 function timestamp() {
