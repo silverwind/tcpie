@@ -10,11 +10,11 @@ deps: node_modules
 
 .PHONY: lint
 lint: node_modules
-	pnpm exec eslint --color --quiet .
+	pnpm exec eslint-silverwind --color --quiet .
 
 .PHONY: lint-fix
 lint-fix: node_modules
-	pnpm exec eslint --color --quiet . --fix
+	pnpm exec eslint-silverwind --color --quiet . --fix
 
 .PHONY: test
 test: lint build node_modules
