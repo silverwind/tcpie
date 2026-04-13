@@ -2,8 +2,6 @@
   "extends": "typescript-config-silverwind",
   "compilerOptions": {
     "types": [
-      "jest-extended",
-      "vite/client",
       "vitest/globals",
     ],
   },
