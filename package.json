@@ -27,6 +27,7 @@
     "esbuild": "0.28.0",
     "eslint": "9.39.4",
     "eslint-config-silverwind": "131.0.4",
+    "jest-extended": "7.0.0",
     "typescript": "6.0.2",
     "typescript-config-silverwind": "17.0.0",
     "updates": "17.15.2",

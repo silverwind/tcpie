@@ -30,6 +30,9 @@ importers:
       eslint-config-silverwind:
         specifier: 131.0.4
         version: 131.0.4(eslint@9.39.4(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.2)
+      jest-extended:
+        specifier: 7.0.0
+        version: 7.0.0(typescript@6.0.2)
       typescript:
         specifier: 6.0.2
         version: 6.0.2
