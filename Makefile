@@ -42,14 +42,11 @@ update: node_modules
 .PHONY: patch
 patch: node_modules test
 	pnpm exec versions -R -c 'make --no-print-directory build' patch package.json
-	git push -u --tags origin master
 
 .PHONY: minor
 minor: node_modules test
 	pnpm exec versions -R -c 'make --no-print-directory build' minor package.json
-	git push -u --tags origin master
 
 .PHONY: major
 major: node_modules test
 	pnpm exec versions -R -c 'make --no-print-directory build' major package.json
-	git push -u --tags origin master
