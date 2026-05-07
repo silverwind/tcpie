@@ -11,7 +11,7 @@
   "sideEffects": false,
   "packageManager": "pnpm@10.33.0",
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "files": [
     "./index.js",
@@ -31,7 +31,7 @@
     "typescript": "6.0.2",
     "typescript-config-silverwind": "17.0.0",
     "updates": "17.15.2",
-    "updates-config-silverwind": "2.1.0",
+    "updates-config-silverwind": "3.0.0",
     "versions": "15.0.0",
     "vitest": "4.1.4",
     "vitest-config-silverwind": "11.3.3"
