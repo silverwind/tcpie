@@ -1,5 +1,5 @@
-SRC := tcpie.js
-DST := dist/tcpie.js
+SOURCE_FILES := index.ts tcpie.ts
+DIST_FILES := dist/index.js dist/tcpie.js
 
 node_modules: pnpm-lock.yaml
 	pnpm install
@@ -9,24 +9,29 @@ node_modules: pnpm-lock.yaml
 deps: node_modules
 
 .PHONY: lint
-lint: node_modules
-	pnpm exec eslint-silverwind --color --quiet .
+lint: node_modules build
+	pnpm exec eslint-silverwind --color .
+	pnpm exec tsgo
 
 .PHONY: lint-fix
-lint-fix: node_modules
-	pnpm exec eslint-silverwind --color --quiet . --fix
+lint-fix: node_modules build
+	pnpm exec eslint-silverwind --color . --fix
+	pnpm exec tsgo
 
 .PHONY: test
-test: lint build node_modules
+test: node_modules
 	pnpm exec vitest
 
-.PHONY: build
-build: $(DST)
+.PHONY: test-update
+test-update: node_modules
+	pnpm exec vitest -u
 
-$(DST): $(SRC) node_modules
-# workaround for https://github.com/evanw/esbuild/issues/1921
-	pnpm exec esbuild --log-level=warning --platform=node --target=node16 --format=esm --bundle --minify --legal-comments=none --banner:js="import {createRequire} from 'module';const require = createRequire(import.meta.url);" --define:import.meta.VERSION=\"$(shell jq .version package.json)\" --outfile=$(DST) $(SRC)
-	chmod +x $(DST)
+.PHONY: build
+build: node_modules $(DIST_FILES)
+
+$(DIST_FILES): $(SOURCE_FILES) pnpm-lock.yaml package.json tsdown.config.ts
+	pnpm exec tsdown
+	chmod +x dist/tcpie.js
 
 .PHONY: publish
 publish: node_modules
@@ -40,13 +45,13 @@ update: node_modules
 	@touch node_modules
 
 .PHONY: patch
-patch: node_modules test
-	pnpm exec versions -R -c 'make --no-print-directory build' patch package.json
+patch: node_modules lint test
+	pnpm exec versions -R patch package.json
 
 .PHONY: minor
-minor: node_modules test
-	pnpm exec versions -R -c 'make --no-print-directory build' minor package.json
+minor: node_modules lint test
+	pnpm exec versions -R minor package.json
 
 .PHONY: major
-major: node_modules test
-	pnpm exec versions -R -c 'make --no-print-directory build' major package.json
+major: node_modules lint test
+	pnpm exec versions -R major package.json

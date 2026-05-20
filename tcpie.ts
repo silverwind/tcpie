@@ -4,20 +4,22 @@ import {isIP} from "node:net";
 import {lookup} from "node:dns";
 import process, {exit, argv, stdin, stdout, stderr} from "node:process";
 import stdev from "compute-stdev";
-import {tcpie} from "./index.js";
+import {tcpie} from "./index.ts";
+import type {EndStats, Stats, TcpieOpts} from "./index.ts";
 import minimist from "minimist";
 import supportsColor from "supports-color";
+import pkg from "./package.json" with {type: "json"};
 
 const args = minimist(argv.slice(2), {
   boolean: [
     "color", "C",
     "timestamp", "T",
     "flood", "f",
-    "version", "v"
-  ]
+    "version", "v",
+  ],
 });
 
-const packageVersion = import.meta.VERSION || "0.0.0";
+const packageVersion = pkg.version || "0.0.0";
 const DIGITS_LINE = 1;
 const DIGITS_STATS = 3;
 const DIGITS_PERC = 0;
@@ -43,7 +45,7 @@ const usage = [
   "      $ tcpie -i .1 8.8.8.8:53",
   "      $ tcpie -c5 -t.05 aspmx.l.google.com 25",
   "",
-  ""
+  "",
 ].join("\n");
 
 if (args.v) {
@@ -56,11 +58,11 @@ if (!args._.length || args._.length > 2 || (args._[1] && Number.isNaN(Number.par
 }
 
 let host = args._[0];
-const opts = {};
+const opts: TcpieOpts = {};
 let port = Number.parseInt(args._[1]);
 let printed = false;
-const rtts = [];
-let stats;
+const rtts: Array<number> = [];
+let stats: Stats | EndStats | undefined;
 
 if (typeof host !== "string") {
   help();
@@ -70,7 +72,7 @@ if (typeof host !== "string") {
 const matches = /^(.+):(\d+)$/.exec(host);
 if (matches?.length === 3 && !port) {
   host = matches[1];
-  port = matches[2];
+  port = Number.parseInt(matches[2]);
 }
 
 if (!port) port = DEFAULT_PORT;
@@ -88,7 +90,7 @@ if (!isIP(host)) {
       run(host, port, opts);
     } else {
       if (err.code === "ENOTFOUND") writeLine(red("ERROR:"), `Host '${host}' not found`);
-      else writeLine(red("ERROR:"), err.code, err.syscall || "");
+      else writeLine(red("ERROR:"), err.code || "", err.syscall || "");
       exit(1);
     }
   });
@@ -97,37 +99,37 @@ if (!isIP(host)) {
   run(host, port, opts);
 }
 
-function run(host, port, opts) {
+function run(host: string, port: number, opts: TcpieOpts): void {
   const pie = tcpie(host, port, opts);
 
-  pie.on("error", (err, data) => {
+  pie.on("error", (err: NodeJS.ErrnoException, data: Stats) => {
     stats = data;
     writeLine(
-      red("error connecting to", `${data.target.host}:${data.target.port}`),
+      red("error connecting to", `${data.target!.host}:${data.target!.port}`),
       `seq=${data.sent}`,
-      `error=${red(err.code)}`
+      `error=${red(err.code!)}`,
     );
-  }).on("connect", data => {
+  }).on("connect", (data: Stats) => {
     stats = data;
-    rtts.push(data.rtt);
+    rtts.push(data.rtt!);
     writeLine(
-      green("connected to", `${data.target.host}:${data.target.port}`),
+      green("connected to", `${data.target!.host}:${data.target!.port}`),
       `seq=${data.sent}`,
-      (data.socket.localPort !== undefined) ? `srcport=${data.socket.localPort}` : "",
-      `time=${colorRTT(data.rtt.toFixed(DIGITS_LINE))}`,
+      (data.socket!.localPort !== undefined) ? `srcport=${data.socket!.localPort}` : "",
+      `time=${colorRTT(Number(data.rtt!.toFixed(DIGITS_LINE)))}`,
     );
-  }).on("timeout", data => {
+  }).on("timeout", (data: Stats) => {
     stats = data;
     writeLine(
-      red("timeout connecting to", `${data.target.host}:${data.target.port}`),
+      red("timeout connecting to", `${data.target!.host}:${data.target!.port}`),
       `seq=${data.sent}`,
-      data.socket.localPort && `srcport=${data.socket.localPort}`
+      data.socket!.localPort ? `srcport=${data.socket!.localPort}` : "",
     );
   });
 
   if (stdin.isTTY) {
     stdin.setRawMode(true);
-    stdin.on("data", bytes => {
+    stdin.on("data", (bytes: Buffer) => {
       // http://nemesis.lonestar.org/reference/telecom/codes/ascii.html
       const exitCodes = [
         3,  // SIGINT
@@ -150,83 +152,84 @@ function run(host, port, opts) {
   pie.on("end", printEnd).start();
 }
 
-function printStart(host, address, port) {
+function printStart(host: string, address: string, port: number): void {
   writeLine("TCPIE", host, `(${address})`, "port", String(port));
 }
 
-function printEnd() {
-  let sum = 0, min = Infinity, max = 0, avg, dev;
+function printEnd(): void {
+  let sum = 0, min = Infinity, max = 0;
+  let avg = "0", dev = "0";
 
-  if (printed) exit(stats.success === 0 && 1 || 0);
+  if (printed) exit(stats!.success === 0 ? 1 : 0);
 
   if (stats && stats.sent > 0) {
     for (const rtt of rtts) {
-      if (rtt <= min) min = rtt.toFixed(DIGITS_STATS);
-      if (rtt >= max) max = rtt.toFixed(DIGITS_STATS);
+      if (rtt <= min) min = Number(rtt.toFixed(DIGITS_STATS));
+      if (rtt >= max) max = Number(rtt.toFixed(DIGITS_STATS));
       sum += rtt;
     }
 
     avg = (sum / rtts.length).toFixed(DIGITS_STATS);
     dev = stdev(rtts).toFixed(DIGITS_STATS);
 
-    if (min === Infinity) min = "0";
-    if (Number.isNaN(avg)) avg = "0";
+    if (min === Infinity) min = 0;
+    if (Number.isNaN(Number(avg))) avg = "0";
 
     printed = true;
 
     writeLine(
       "\n---", host, `tcpie statistics`, "---",
-      `\n${stats.sent}`, "handshakes attempted,", stats.success || "0", "succeeded,",
+      `\n${stats.sent}`, "handshakes attempted,", String(stats.success || "0"), "succeeded,",
       `${((stats.failed / stats.sent) * 100).toFixed(DIGITS_PERC)}% failed`,
-      "\nrtt min/avg/max/stdev =", `${min}/${avg}/${max}/${dev}`, "ms"
+      "\nrtt min/avg/max/stdev =", `${min}/${avg}/${max}/${dev}`, "ms",
     );
 
-    exit(stats.success === 0 && 1 || 0);
+    exit(stats.success === 0 ? 1 : 0);
   } else {
     exit(1);
   }
 }
 
-function colorRTT(rtt) {
+function colorRTT(rtt: number): string {
   if (rtt >= 150) {
-    return `${red(rtt)} ms`;
+    return `${red(String(rtt))} ms`;
   } else if (rtt >= 75) {
-    return `${yellow(rtt)} ms`;
+    return `${yellow(String(rtt))} ms`;
   } else {
-    return `${green(rtt)} ms`;
+    return `${green(String(rtt))} ms`;
   }
 }
 
-function writeLine(...arg) {
+function writeLine(...arg: Array<string>): void {
   arg = arg.filter(Boolean);
   if ((args.timeout || args.T) && arg[0][0] !== "\n") arg.unshift(timestamp());
   arg.push("\n");
-  const stream = (stdout._type === "pipe" && printed) ? stderr : stdout;
+  const stream = ((stdout as unknown as {_type?: string})._type === "pipe" && printed) ? stderr : stdout;
   stream.write(arg.join(" "));
 }
 
-function help() {
+function help(): void {
   stdout.write(usage);
   exit(1);
 }
 
-function secondsToMs(s) {
+function secondsToMs(s: string): number {
   return (Number.parseFloat(s) * 1000);
 }
 
-function timestamp() {
+function timestamp(): string {
   const now = new Date();
   const year = now.getFullYear();
-  let month = now.getMonth() + 1;
-  let day = now.getDate();
-  let hrs = now.getHours();
-  let mins = now.getMinutes();
-  let secs = now.getSeconds();
+  let month = String(now.getMonth() + 1);
+  let day = String(now.getDate());
+  let hrs = String(now.getHours());
+  let mins = String(now.getMinutes());
+  let secs = String(now.getSeconds());
 
-  if (month < 10) month = `0${month}`;
-  if (day < 10) day = `0${day}`;
-  if (hrs < 10) hrs = `0${hrs}`;
-  if (mins < 10) mins = `0${mins}`;
-  if (secs < 10) secs = `0${secs}`;
+  if (Number(month) < 10) month = `0${month}`;
+  if (Number(day) < 10) day = `0${day}`;
+  if (Number(hrs) < 10) hrs = `0${hrs}`;
+  if (Number(mins) < 10) mins = `0${mins}`;
+  if (Number(secs) < 10) secs = `0${secs}`;
   return `${year}-${month}-${day} ${hrs}:${mins}:${secs}`;
 }
