@@ -3,20 +3,34 @@ import {red, yellow, green, disableColor} from "glowie";
 import {isIP} from "node:net";
 import {lookup} from "node:dns";
 import process, {exit, argv, stdin, stdout, stderr} from "node:process";
-import stdev from "compute-stdev";
+import {parseArgs, type ParseArgsConfig} from "node:util";
 import {tcpie} from "./index.ts";
 import type {EndStats, Stats, TcpieOpts} from "./index.ts";
-import minimist from "minimist";
-import supportsColor from "supports-color";
 import pkg from "./package.json" with {type: "json"};
 
-const args = minimist(argv.slice(2), {
-  boolean: [
-    "color", "C",
-    "timestamp", "T",
-    "flood", "f",
-    "version", "v",
-  ],
+function parseArgv<T extends ParseArgsConfig>(config: T): ReturnType<typeof parseArgs<T>> {
+  try {
+    return parseArgs(config);
+  } catch (err) {
+    stderr.write(`${(err as Error).message}\n`);
+    return exit(1);
+  }
+}
+
+const {values: args, positionals} = parseArgv({
+  args: argv.slice(2),
+  strict: true,
+  allowPositionals: true,
+  options: {
+    version: {type: "boolean", short: "v"},
+    help: {type: "boolean", short: "h"},
+    count: {type: "string", short: "c"},
+    interval: {type: "string", short: "i"},
+    timeout: {type: "string", short: "t"},
+    timestamp: {type: "boolean", short: "T"},
+    flood: {type: "boolean", short: "f"},
+    "no-color": {type: "boolean", short: "C"},
+  },
 });
 
 const packageVersion = pkg.version || "0.0.0";
@@ -31,6 +45,7 @@ const usage = [
   "",
   "    Options:",
   "",
+  "      -h, --help          output help",
   "      -v, --version       output version",
   "      -c, --count <n>     number of connects (default: infinite)",
   "      -i, --interval <n>  wait n seconds between connects (default: 1)",
@@ -48,18 +63,19 @@ const usage = [
   "",
 ].join("\n");
 
-if (args.v) {
+if (args.version) {
   console.info(packageVersion);
   exit(0);
 }
 
-if (!args._.length || args._.length > 2 || (args._[1] && Number.isNaN(Number.parseInt(args._[1])))) {
+if (args.help || !positionals.length || positionals.length > 2 ||
+  (positionals[1] && Number.isNaN(Number.parseInt(positionals[1])))) {
   help();
 }
 
-let host = args._[0];
+let host = positionals[0];
 const opts: TcpieOpts = {};
-let port = Number.parseInt(args._[1]);
+let port = Number.parseInt(positionals[1]);
 let printed = false;
 const rtts: Array<number> = [];
 let stats: Stats | EndStats | undefined;
@@ -76,11 +92,11 @@ if (matches?.length === 3 && !port) {
 }
 
 if (!port) port = DEFAULT_PORT;
-if (args.count || args.c) opts.count = Number.parseInt(args.count || args.c);
-if (args.interval || args.i) opts.interval = secondsToMs(args.interval || args.i);
-if (args.timeout || args.t) opts.timeout = secondsToMs(args.timeout || args.t);
-if (args.flood || args.f) opts.interval = 0;
-if (args.C || !supportsColor.stdout) disableColor();
+if (args.count && Number(args.count) !== 0) opts.count = Number.parseInt(args.count);
+if (args.interval && Number(args.interval) !== 0) opts.interval = secondsToMs(args.interval);
+if (args.timeout && Number(args.timeout) !== 0) opts.timeout = secondsToMs(args.timeout);
+if (args.flood) opts.interval = 0;
+if (args["no-color"] || !stdout.hasColors?.()) disableColor();
 
 // Do a DNS lookup and start the connects
 if (!isIP(host)) {
@@ -190,6 +206,19 @@ function printEnd(): void {
   }
 }
 
+function stdev(values: Array<number>): number {
+  if (values.length < 2) return 0;
+
+  let count = 0, mean = 0, squaredDifferenceSum = 0;
+  for (const value of values) {
+    count++;
+    const delta = value - mean;
+    mean += delta / count;
+    squaredDifferenceSum += delta * (value - mean);
+  }
+  return Math.sqrt(squaredDifferenceSum / (count - 1));
+}
+
 function colorRTT(rtt: number): string {
   if (rtt >= 150) {
     return `${red(String(rtt))} ms`;
@@ -202,7 +231,7 @@ function colorRTT(rtt: number): string {
 
 function writeLine(...arg: Array<string>): void {
   arg = arg.filter(Boolean);
-  if ((args.timeout || args.T) && arg[0][0] !== "\n") arg.unshift(timestamp());
+  if (args.timestamp && arg[0][0] !== "\n") arg.unshift(timestamp());
   arg.push("\n");
   const stream = ((stdout as unknown as {_type?: string})._type === "pipe" && printed) ? stderr : stdout;
   stream.write(arg.join(" "));

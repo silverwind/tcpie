@@ -26,6 +26,8 @@ connected to google.com:443 seq=5 srcport=59057 time=10.4 ms
 rtt min/avg/max/stdev = 10.012/10.970/12.854/1.190 ms
 ```
 
+Run `tcpie -h` to see all CLI options. Unknown options are rejected.
+
 ## API
 
 ### Usage
