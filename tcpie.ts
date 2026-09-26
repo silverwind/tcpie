@@ -151,10 +151,10 @@ function run(host: string, port: number, opts: TcpieOpts): void {
       }
     });
   } else {
-    process.on("SIGINT", exit);
-    process.on("SIGQUIT", exit);
-    process.on("SIGTERM", exit);
-    process.on("SIGTSTP", exit);
+    process.on("SIGINT", printEnd);
+    process.on("SIGQUIT", printEnd);
+    process.on("SIGTERM", printEnd);
+    process.on("SIGTSTP", printEnd);
   }
 
   process.on("exit", printEnd);
