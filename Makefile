@@ -9,12 +9,12 @@ node_modules: pnpm-lock.yaml
 deps: node_modules
 
 .PHONY: lint
-lint: node_modules build
+lint: node_modules
 	pnpm exec eslint-silverwind --color .
 	pnpm exec tsgo
 
 .PHONY: lint-fix
-lint-fix: node_modules build
+lint-fix: node_modules
 	pnpm exec eslint-silverwind --color . --fix
 	pnpm exec tsgo
 
@@ -30,9 +30,8 @@ test-update: node_modules
 .PHONY: build
 build: node_modules $(DIST_FILES)
 
-$(DIST_FILES): $(SOURCE_FILES) pnpm-lock.yaml package.json tsdown.config.ts
+$(DIST_FILES): $(SOURCE_FILES) pnpm-lock.yaml package.json tsconfig.json tsdown.config.ts
 	pnpm exec tsdown
-	chmod +x dist/tcpie.js
 
 .PHONY: publish
 publish: node_modules
@@ -48,10 +47,10 @@ update-js: node_modules
 	pnpm install
 	@touch node_modules
 
-.PHONY: patch minor major
-patch minor major: node_modules lint test
-	pnpm exec versions -R $@ package.json
-
 .PHONY: update-actions
 update-actions: node_modules
 	pnpm exec updates -u -M actions
+
+.PHONY: patch minor major
+patch minor major: node_modules lint test
+	pnpm exec versions -R $@ package.json
