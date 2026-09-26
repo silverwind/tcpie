@@ -60,10 +60,8 @@ export class Tcpie extends EventEmitter { // eslint-disable-line unicorn/prefer-
   opts: Required<TcpieOpts>;
   stats: Stats;
   private next?: ReturnType<typeof setTimeout>;
-  private done = false;
   private abort = false;
-  private socket?: Socket;
-  private startTime = 0;
+  private pending = new Set<Socket>();
 
   constructor(host: string, port?: number, opts?: TcpieOpts) {
     super();
@@ -100,6 +98,8 @@ export class Tcpie extends EventEmitter { // eslint-disable-line unicorn/prefer-
   private checkEnd(): void {
     if (this.abort || ((this.stats.failed + this.stats.success) >= this.opts.count)) {
       clearTimeout(this.next);
+      for (const socket of this.pending) socket.destroy();
+      this.pending.clear();
 
       this.emit("end", {
         sent: this.stats.sent,
@@ -113,16 +113,6 @@ export class Tcpie extends EventEmitter { // eslint-disable-line unicorn/prefer-
     }
   }
 
-  private fail(event: "timeout" | "error", ...args: Array<Error>): void {
-    if (this.done) return;
-    this.done = true;
-    this.stats.sent++;
-    this.stats.failed++;
-    this.emit(event, ...args, this.addDetails(this.socket!));
-    this.socket!.destroy();
-    this.checkEnd();
-  }
-
   /** Start the connection attempts. */
   start(subsequent?: boolean): this {
     if (!subsequent) {
@@ -132,22 +122,34 @@ export class Tcpie extends EventEmitter { // eslint-disable-line unicorn/prefer-
     }
 
     this.next = setTimeout(this.start.bind(this, true), this.opts.interval);
-    this.done = false;
     this.abort = false;
-    this.socket = new Socket();
-    this.startTime = performance.now();
+    const socket = new Socket();
+    this.pending.add(socket);
+    let done = false;
+    const fail = (event: "timeout" | "error", ...args: Array<Error>): void => {
+      if (done) return;
+      done = true;
+      this.pending.delete(socket);
+      this.stats.sent++;
+      this.stats.failed++;
+      this.emit(event, ...args, this.addDetails(socket));
+      socket.destroy();
+      this.checkEnd();
+    };
+    const startTime = performance.now();
 
-    this.socket.setTimeout(this.opts.timeout);
-    this.socket.on("timeout", () => this.fail("timeout"));
-    this.socket.on("error", err => this.fail("error", err));
-    this.socket.connect(this.port, this.host, () => {
-      if (!this.done) {
-        this.done = true;
+    socket.setTimeout(this.opts.timeout);
+    socket.on("timeout", () => fail("timeout"));
+    socket.on("error", err => fail("error", err));
+    socket.connect(this.port, this.host, () => {
+      if (!done) {
+        done = true;
         this.stats.sent++;
         this.stats.success++;
-        this.stats.rtt = performance.now() - this.startTime;
-        this.emit("connect", this.addDetails(this.socket!));
-        this.socket!.end();
+        this.stats.rtt = performance.now() - startTime;
+        this.pending.delete(socket);
+        this.emit("connect", this.addDetails(socket));
+        socket.end();
         this.checkEnd();
       }
     });
@@ -158,7 +160,6 @@ export class Tcpie extends EventEmitter { // eslint-disable-line unicorn/prefer-
   /** Stop the connection attempts and emit the `end` event. */
   stop(): this {
     this.abort = true;
-    this.socket!.end();
     this.checkEnd();
     return this;
   }
