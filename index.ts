@@ -152,7 +152,7 @@ export class Tcpie extends EventEmitter { // eslint-disable-line unicorn/prefer-
         this.stats.rtt = performance.now() - startTime;
         this.pending.delete(socket);
         this.emit("connect", this.addDetails(socket));
-        socket.end();
+        socket.end().resume();
         this.checkEnd();
       }
     });

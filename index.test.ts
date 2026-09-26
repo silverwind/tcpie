@@ -5,7 +5,7 @@ import {tcpie} from "./index.ts";
 import type {EndStats, Stats} from "./index.ts";
 
 async function listen(): Promise<number> {
-  const server = createServer(socket => socket.destroy()).listen(0, "127.0.0.1").unref();
+  const server = createServer(socket => socket.end("banner")).listen(0, "127.0.0.1").unref();
   await once(server, "listening");
   return (server.address() as AddressInfo).port;
 }
@@ -57,6 +57,15 @@ test("overlapping attempts measure their own rtt", async () => {
   spy.mockRestore();
   expect(rtts).toHaveLength(3);
   for (const rtt of rtts) expect(rtt).toBeGreaterThan(50);
+});
+
+test("sockets close after the server sends data and closes", async () => {
+  const bannerPort = await listen();
+  const spy = vi.spyOn(Socket.prototype, "end");
+  await once(tcpie("127.0.0.1", bannerPort, {count: 1}).start(), "end");
+  const socket = (spy.mock.contexts as Array<Socket>).find(socket => socket.remotePort === bannerPort)!;
+  spy.mockRestore();
+  await once(socket, "close");
 });
 
 test("cli accepts ipv6 address without port", async () => {
