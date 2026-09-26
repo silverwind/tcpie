@@ -83,7 +83,7 @@ Stops connecting
 - `target`  *object* : target details: `host` and `port`.
 
 The following properties are present on all events except `end`:
-- `rtt`     *number* : roundtrip time in milliseconds. *undefined* if failed.
+- `rtt`     *number* : roundtrip time in milliseconds of the last successful attempt. *undefined* until one succeeds.
 - `socket`  *object* : socket details: `localAddress`, `localPort`, `remoteAddress`, `remotePort`.
 
 © [silverwind](https://github.com/silverwind), distributed under BSD licence
