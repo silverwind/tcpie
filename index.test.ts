@@ -1,8 +1,7 @@
 import {execFile} from "node:child_process";
 import {once} from "node:events";
 import {createServer, Socket, type AddressInfo} from "node:net";
-import {tcpie} from "./index.ts";
-import type {EndStats, Stats} from "./index.ts";
+import {tcpie, type EndStats, type Stats} from "./index.ts";
 
 async function listen(): Promise<number> {
   const server = createServer(socket => socket.end("banner")).listen(0, "127.0.0.1").unref();
@@ -12,7 +11,7 @@ async function listen(): Promise<number> {
 
 const port = await listen();
 
-test("first", async () => {
+test("restarting from the end listener repeats the run", async () => {
   const pie = tcpie("127.0.0.1", port, {count: 2, interval: 10});
   const ends = await new Promise<Array<EndStats>>(resolve => {
     const ends: Array<EndStats> = [];
@@ -25,19 +24,16 @@ test("first", async () => {
   for (const stats of ends) expect(stats).toMatchObject({sent: 2, success: 2, failed: 0});
 });
 
-test("second", async () => {
+test("stop from a connect listener ends the run once", async () => {
   const pie = tcpie("127.0.0.1", port, {count: 2});
-  const connects: Array<Stats> = [];
-  const ends: Array<EndStats> = [];
+  const events: Array<[string, Stats | EndStats]> = [];
   pie.on("connect", (stats: Stats) => {
-    connects.push({...stats});
+    events.push(["connect", {...stats}]);
     pie.stop();
-  }).on("end", (stats: EndStats) => {
-    ends.push(stats);
-  }).start();
+  }).on("end", (stats: EndStats) => { events.push(["end", stats]); }).start();
   await once(pie, "end");
-  expect(connects).toMatchObject([{sent: 1, success: 1, failed: 0}]);
-  expect(ends).toMatchObject([{sent: 1, success: 1, failed: 0}]);
+  const stats = {sent: 1, success: 1, failed: 0};
+  expect(events).toMatchObject([["connect", stats], ["end", stats]]);
 });
 
 test("overlapping attempts measure their own rtt", async () => {
@@ -49,14 +45,11 @@ test("overlapping attempts measure their own rtt", async () => {
     return this;
   });
   const rtts: Array<number> = [];
-  const pie = tcpie("127.0.0.1", slowPort, {count: 3, interval: 10});
-  pie.on("connect", (stats: Stats) => {
+  await once(tcpie("127.0.0.1", slowPort, {count: 3, interval: 10}).on("connect", (stats: Stats) => {
     rtts.push(stats.rtt!);
-  }).start();
-  await once(pie, "end");
+  }).start(), "end");
   spy.mockRestore();
-  expect(rtts).toHaveLength(3);
-  for (const rtt of rtts) expect(rtt).toBeGreaterThan(50);
+  expect(rtts.map(rtt => rtt > 50)).toEqual([true, true, true]);
 });
 
 test("sockets close after the server sends data and closes", async () => {
