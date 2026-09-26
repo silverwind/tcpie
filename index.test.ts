@@ -1,3 +1,4 @@
+import {execFile} from "node:child_process";
 import {once} from "node:events";
 import {createServer, Socket, type AddressInfo} from "node:net";
 import {tcpie} from "./index.ts";
@@ -56,4 +57,11 @@ test("overlapping attempts measure their own rtt", async () => {
   spy.mockRestore();
   expect(rtts).toHaveLength(3);
   for (const rtt of rtts) expect(rtt).toBeGreaterThan(50);
+});
+
+test("cli accepts ipv6 address without port", async () => {
+  const stdout = await new Promise<string>(resolve => {
+    execFile(process.execPath, ["tcpie.ts", "-c1", "-t.01", "::1"], (_err, stdout) => resolve(stdout));
+  });
+  expect(stdout).toMatch(/^TCPIE ::1 \(::1\) port 22 /);
 });

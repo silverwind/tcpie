@@ -79,9 +79,9 @@ let printed = false;
 const rtts: Array<number> = [];
 let stats: Stats | undefined;
 
-// host:port syntax
+// host:port syntax, unless that would cut a bare IPv6 address into an invalid one
 const matches = /^(.+):(\d+)$/.exec(host);
-if (matches && !port) {
+if (matches && !port && (!isIP(host) || isIP(matches[1]))) {
   host = matches[1];
   port = Number.parseInt(matches[2]);
 }
