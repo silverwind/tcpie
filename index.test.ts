@@ -9,7 +9,7 @@ test("first", () => {
     expect(stats.sent).toEqual(2);
     expect(stats.success).toEqual(2);
     expect(stats.failed).toEqual(0);
-    if (runs < 5) pie.start(); // run 5 times
+    if (runs < 5) pie.start();
   }).start();
 });
 

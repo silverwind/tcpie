@@ -53,13 +53,11 @@ export type TcpieOpts = {
   count?: number,
 };
 
-type ResolvedOpts = Required<TcpieOpts>;
-
 /** A TCP ping instance. Emits `connect`, `timeout`, `error`, and `end` events. */
 export class Tcpie extends EventEmitter { // eslint-disable-line unicorn/prefer-event-target -- public API emits multi-arg events and chains
   host: string;
   port: number;
-  opts: ResolvedOpts;
+  opts: Required<TcpieOpts>;
   stats: Stats;
   private next?: ReturnType<typeof setTimeout>;
   private done = false;
@@ -83,7 +81,6 @@ export class Tcpie extends EventEmitter { // eslint-disable-line unicorn/prefer-
     };
   }
 
-  // add details to stats object
   private addDetails(socket: Socket): Stats {
     this.stats.target = {
       host: this.host,
@@ -100,10 +97,9 @@ export class Tcpie extends EventEmitter { // eslint-disable-line unicorn/prefer-
     return this.stats;
   }
 
-  // check end condition
   private checkEnd(): void {
     if (this.abort || ((this.stats.failed + this.stats.success) >= this.opts.count)) {
-      if (this.next) clearTimeout(this.next);
+      clearTimeout(this.next);
 
       this.emit("end", {
         sent: this.stats.sent,
@@ -115,6 +111,16 @@ export class Tcpie extends EventEmitter { // eslint-disable-line unicorn/prefer-
         },
       } satisfies EndStats);
     }
+  }
+
+  private fail(event: "timeout" | "error", ...args: Array<Error>): void {
+    if (this.done) return;
+    this.done = true;
+    this.stats.sent++;
+    this.stats.failed++;
+    this.emit(event, ...args, this.addDetails(this.socket!));
+    this.socket!.destroy();
+    this.checkEnd();
   }
 
   /** Start the connection attempts. */
@@ -132,34 +138,14 @@ export class Tcpie extends EventEmitter { // eslint-disable-line unicorn/prefer-
     this.startTime = performance.now();
 
     this.socket.setTimeout(this.opts.timeout);
-    this.socket.on("timeout", () => {
-      if (!this.done) {
-        this.done = true;
-        this.stats.sent++;
-        this.stats.failed++;
-        this.emit("timeout", this.addDetails(this.socket!));
-        this.socket!.destroy();
-        this.checkEnd();
-      }
-    });
-
-    this.socket.on("error", err => {
-      if (!this.done) {
-        this.done = true;
-        this.stats.sent++;
-        this.stats.failed++;
-        this.emit("error", err, this.addDetails(this.socket!));
-        this.socket!.destroy();
-        this.checkEnd();
-      }
-    });
-
+    this.socket.on("timeout", () => this.fail("timeout"));
+    this.socket.on("error", err => this.fail("error", err));
     this.socket.connect(this.port, this.host, () => {
       if (!this.done) {
         this.done = true;
         this.stats.sent++;
         this.stats.success++;
-        this.stats.rtt = (performance.now() - this.startTime);
+        this.stats.rtt = performance.now() - this.startTime;
         this.emit("connect", this.addDetails(this.socket!));
         this.socket!.end();
         this.checkEnd();

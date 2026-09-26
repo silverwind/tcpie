@@ -5,7 +5,7 @@ import {lookup} from "node:dns";
 import process, {exit, argv, stdin, stdout, stderr} from "node:process";
 import {parseArgs, type ParseArgsConfig} from "node:util";
 import {tcpie} from "./index.ts";
-import type {EndStats, Stats, TcpieOpts} from "./index.ts";
+import type {Stats, TcpieOpts} from "./index.ts";
 import pkg from "./package.json" with {type: "json"};
 
 function parseArgv<T extends ParseArgsConfig>(config: T): ReturnType<typeof parseArgs<T>> {
@@ -33,7 +33,6 @@ const {values: args, positionals} = parseArgv({
   },
 });
 
-const packageVersion = pkg.version || "0.0.0";
 const DIGITS_LINE = 1;
 const DIGITS_STATS = 3;
 const DIGITS_PERC = 0;
@@ -64,7 +63,7 @@ const usage = [
 ].join("\n");
 
 if (args.version) {
-  console.info(packageVersion);
+  console.info(pkg.version);
   exit(0);
 }
 
@@ -78,15 +77,11 @@ const opts: TcpieOpts = {};
 let port = Number.parseInt(positionals[1]);
 let printed = false;
 const rtts: Array<number> = [];
-let stats: Stats | EndStats | undefined;
-
-if (typeof host !== "string") {
-  help();
-}
+let stats: Stats | undefined;
 
 // host:port syntax
 const matches = /^(.+):(\d+)$/.exec(host);
-if (matches?.length === 3 && !port) {
+if (matches && !port) {
   host = matches[1];
   port = Number.parseInt(matches[2]);
 }
@@ -98,7 +93,6 @@ if (args.timeout && Number(args.timeout) !== 0) opts.timeout = secondsToMs(args.
 if (args.flood) opts.interval = 0;
 if (args["no-color"] || !stdout.hasColors?.()) disableColor();
 
-// Do a DNS lookup and start the connects
 if (!isIP(host)) {
   lookup(host, (err, address) => {
     if (!err) {
@@ -146,7 +140,6 @@ function run(host: string, port: number, opts: TcpieOpts): void {
   if (stdin.isTTY) {
     stdin.setRawMode(true);
     stdin.on("data", (bytes: Buffer) => {
-      // http://nemesis.lonestar.org/reference/telecom/codes/ascii.html
       const exitCodes = [
         3,  // SIGINT
         4,  // EOF
@@ -173,21 +166,17 @@ function printStart(host: string, address: string, port: number): void {
 }
 
 function printEnd(): void {
-  let sum = 0, min = Infinity, max = 0;
-  let avg = "0", dev = "0";
-
   if (printed) exit(stats!.success === 0 ? 1 : 0);
 
   if (stats && stats.sent > 0) {
+    let sum = 0, min = Infinity, max = 0;
     for (const rtt of rtts) {
       if (rtt <= min) min = Number(rtt.toFixed(DIGITS_STATS));
       if (rtt >= max) max = Number(rtt.toFixed(DIGITS_STATS));
       sum += rtt;
     }
 
-    avg = (sum / rtts.length).toFixed(DIGITS_STATS);
-    dev = stdev(rtts).toFixed(DIGITS_STATS);
-
+    let avg = (sum / rtts.length).toFixed(DIGITS_STATS);
     if (min === Infinity) min = 0;
     if (Number.isNaN(Number(avg))) avg = "0";
 
@@ -195,9 +184,9 @@ function printEnd(): void {
 
     writeLine(
       "\n---", host, `tcpie statistics`, "---",
-      `\n${stats.sent}`, "handshakes attempted,", String(stats.success || "0"), "succeeded,",
+      `\n${stats.sent}`, "handshakes attempted,", String(stats.success), "succeeded,",
       `${((stats.failed / stats.sent) * 100).toFixed(DIGITS_PERC)}% failed`,
-      "\nrtt min/avg/max/stdev =", `${min}/${avg}/${max}/${dev}`, "ms",
+      "\nrtt min/avg/max/stdev =", `${min}/${avg}/${max}/${stdev(rtts).toFixed(DIGITS_STATS)}`, "ms",
     );
 
     exit(stats.success === 0 ? 1 : 0);
@@ -242,23 +231,16 @@ function help(): void {
   exit(1);
 }
 
-function secondsToMs(s: string): number {
-  return (Number.parseFloat(s) * 1000);
+function secondsToMs(seconds: string): number {
+  return Number.parseFloat(seconds) * 1000;
+}
+
+function twoDigits(num: number): string {
+  return num < 10 ? `0${num}` : String(num);
 }
 
 function timestamp(): string {
   const now = new Date();
-  const year = now.getFullYear();
-  let month = String(now.getMonth() + 1);
-  let day = String(now.getDate());
-  let hrs = String(now.getHours());
-  let mins = String(now.getMinutes());
-  let secs = String(now.getSeconds());
-
-  if (Number(month) < 10) month = `0${month}`;
-  if (Number(day) < 10) day = `0${day}`;
-  if (Number(hrs) < 10) hrs = `0${hrs}`;
-  if (Number(mins) < 10) mins = `0${mins}`;
-  if (Number(secs) < 10) secs = `0${secs}`;
-  return `${year}-${month}-${day} ${hrs}:${mins}:${secs}`;
+  return `${now.getFullYear()}-${twoDigits(now.getMonth() + 1)}-${twoDigits(now.getDate())} ` +
+    `${twoDigits(now.getHours())}:${twoDigits(now.getMinutes())}:${twoDigits(now.getSeconds())}`;
 }
