@@ -3,17 +3,15 @@
 
 > Ping any TCP port
 
-tcpie is a tool to measure latency and verify the reliabilty of a TCP connection. It does so by initiating a handshake followed by an immediately termination of the socket. While many existing tools require raw socket access, tcpie runs fine in user space. An API for use as a module is also provided.
+tcpie is a tool to measure latency and verify the reliability of a TCP connection. It does so by initiating a handshake followed by an immediate termination of the socket. While many existing tools require raw socket access, tcpie runs fine in user space. An API for use as a module is also provided.
 
-## CLI
+## Usage
 
-### Installation
+```sh
+pnpm dlx tcpie -c 5 google.com 443
 ```
-$ npm i -g tcpie
+
 ```
-### Example
-```
-$ tcpie -c 5 google.com 443
 TCPIE google.com (188.21.9.120) port 443
 connected to google.com:443 seq=1 srcport=59053 time=12.9 ms
 connected to google.com:443 seq=2 srcport=59054 time=10.0 ms
@@ -26,11 +24,14 @@ connected to google.com:443 seq=5 srcport=59057 time=10.4 ms
 rtt min/avg/max/stdev = 10.012/10.970/12.854/1.190 ms
 ```
 
-Run `tcpie -h` to see all CLI options. Unknown options are rejected.
+Run `pnpm dlx tcpie -h` to see all CLI options. Unknown options are rejected.
 
-## API
+To use the API:
 
-### Usage
+```sh
+pnpm add tcpie
+```
+
 ```js
 import {tcpie} from "tcpie";
 const pie = tcpie("google.com", 443, {count: 10, interval: 500, timeout: 2000});
@@ -47,35 +48,37 @@ pie.on("connect", function(stats) {
   // ->   sent: 10,
   // ->   success: 10,
   // ->   failed: 0,
-  // ->   target: { host: "google.com", port: 443 }
+  // ->   target: {host: "google.com", port: 443}
   // -> }
 }).start();
 ```
-#### tcpie(host, [port], [options])
+
+## API
+### tcpie(host, [port], [options])
 - `host` *string* : the destination host name or IP address. Required.
-- `port` *number* : the destination port. Default: `22`.
-- `opts` *object* : options for count, interval and timeout. Defaults: `Infinity`, `1000`, `3000`.
+- `port` *number* : the destination port. Default: `80`.
+- `options` *object* : see below.
 
-#### tcpie#start()
-Start connecting
+### tcpie#start()
+Starts connecting
 
-#### tcpie#stop()
+### tcpie#stop()
 Stops connecting
 
-#### *options* object
-- `count`    *number* : the number of connection attempts in milliseconds (default: Infinity).
+### *options* object
+- `count`    *number* : the number of connection attempts (default: Infinity).
 - `interval` *number* : the interval between connection attempts in milliseconds (default: 1000).
 - `timeout`  *number* : the connection timeout in milliseconds (default: 3000).
 
-#### Events
+### Events
 - `connect` : Arguments: `stats`. Connection attempt succeeded.
 - `timeout` : Arguments: `stats`. Connection attempt ran into the timeout.
 - `error`   : Arguments: `err`, `stats`. Connection attempt failed.
 - `end`     : Arguments: `stats`. All connection attempts have finished.
 
-#### *stats* argument properties
+### *stats* argument properties
 - `sent`    *number* : number of total attempts made.
-- `success` *number* : number of successfull attempts.
+- `success` *number* : number of successful attempts.
 - `failed`  *number* : number of failed attempts.
 - `target`  *object* : target details: `host` and `port`.
 
