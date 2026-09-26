@@ -27,13 +27,16 @@ test("first", async () => {
 test("second", async () => {
   const pie = tcpie("127.0.0.1", port, {count: 2});
   const connects: Array<Stats> = [];
+  const ends: Array<EndStats> = [];
   pie.on("connect", (stats: Stats) => {
     connects.push({...stats});
     pie.stop();
+  }).on("end", (stats: EndStats) => {
+    ends.push(stats);
   }).start();
-  const [end] = await once(pie, "end");
+  await once(pie, "end");
   expect(connects).toMatchObject([{sent: 1, success: 1, failed: 0}]);
-  expect(end).toMatchObject({sent: 1, success: 1, failed: 0});
+  expect(ends).toMatchObject([{sent: 1, success: 1, failed: 0}]);
 });
 
 test("overlapping attempts measure their own rtt", async () => {

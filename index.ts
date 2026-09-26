@@ -61,6 +61,7 @@ export class Tcpie extends EventEmitter { // eslint-disable-line unicorn/prefer-
   stats: Stats;
   private next?: ReturnType<typeof setTimeout>;
   private abort = false;
+  private ended = false;
   private pending = new Set<Socket>();
 
   constructor(host: string, port?: number, opts?: TcpieOpts) {
@@ -96,7 +97,8 @@ export class Tcpie extends EventEmitter { // eslint-disable-line unicorn/prefer-
   }
 
   private checkEnd(): void {
-    if (this.abort || ((this.stats.failed + this.stats.success) >= this.opts.count)) {
+    if (!this.ended && (this.abort || ((this.stats.failed + this.stats.success) >= this.opts.count))) {
+      this.ended = true;
       clearTimeout(this.next);
       for (const socket of this.pending) socket.destroy();
       this.pending.clear();
@@ -123,6 +125,7 @@ export class Tcpie extends EventEmitter { // eslint-disable-line unicorn/prefer-
 
     this.next = setTimeout(this.start.bind(this, true), this.opts.interval);
     this.abort = false;
+    this.ended = false;
     const socket = new Socket();
     this.pending.add(socket);
     let done = false;
