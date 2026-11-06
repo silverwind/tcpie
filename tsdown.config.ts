@@ -10,8 +10,6 @@ export default defineConfig([
   nodeCli({
     url: import.meta.url,
     entry: "tcpie.ts",
-    minify: true,
     sourcemap: false,
-    dts: false,
   }),
 ]);
